@@ -56,3 +56,22 @@ int game_over(){
 void show_final_message(){
     printf("GAME OVER!");
 }
+
+void print_intro() {
+    printf("Welcome to GU-Keep'Em!!\n");
+    printf("=========================================\n\n");
+
+    printf("    .------.    .------.    .------.\n");
+    printf("   |A_  __ |  |A_  _  |  |A_  _  |\n");
+    printf("   |( \\/ )|  |( \\/ )|  |( . ) |\n");
+    printf("   | \\  / |  | \\  / |  | \\ /  |\n");
+    printf("   |  \\/ A|  |  \\/ A|  |  v  A|\n");
+    printf("   `------'  `------'  `------'\n");
+
+    printf("\n=========================================\n");
+    printf("🛠️  BETA VERSION - Week 1: Interface Scaffold Only\n");
+    printf("=========================================\n\n");
+
+    printf("Press Enter to start...\n");
+    getchar(); // Wait for Enter
+}

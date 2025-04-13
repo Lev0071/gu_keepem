@@ -1,7 +1,7 @@
 #include "game.h"
 
 int main() {
-    //print_intro();
+    print_intro();
     setup_game();
     while (!game_over()) {
         play_hand();           // Fake hands for now
