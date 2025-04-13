@@ -1,4 +1,5 @@
 #include "game.h"
+#include "utils.h"
 
 int main() {
     print_intro();

@@ -26,6 +26,26 @@ gu_keepem/
 | Week 6 | Custom feature development |
 | Week 7 | Final presentation |
 
+## 🧪 How to Compile and Run
+
+### 🛠️ Compile the program (Linux/macOS)
+```bash
+gcc -o gu_keepem main.c game.c player.c utils.c
+```
+
+### ▶️ Run the program
+```bash
+./gu_keepem
+```
+
+### 🪟 On Windows (CMD or PowerShell)
+```bash
+gcc -o gu_keepem.exe main.c game.c player.c utils.c
+gu_keepem.exe
+```
+
+Make sure you're in the same directory as the `.c` and `.h` files when compiling and running.
+
 ## 👨‍💻 Author
 
 - Student ID: `s2921450`

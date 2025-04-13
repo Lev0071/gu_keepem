@@ -3,5 +3,6 @@
 
 int get_integer_input(const char *prompt);
 void get_string_input(const char *promt, char *buffer,int size);
+void print_intro();
 
 #endif
