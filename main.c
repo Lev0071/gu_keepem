@@ -1,3 +1,5 @@
+#include "game.h"
+
 int main() {
     setup_game();
     while (!game_over()) {
