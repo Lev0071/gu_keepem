@@ -8,9 +8,14 @@
 
 int player_quits[3] = {1, 0, 1};
 int gameOver = 0;
-void setup_game(){
+int player_count;
+
+void setup_game(){      // Ask number of players,names,assign credits
     srand(time(NULL)); //Seed randon generator
-    printf("Inside setup_game");
+    
+    do{
+        player_count = get_integer_input("Enter number of players [2-8]: ");
+    }while(player_count<2||player_count>MAX_PLAYERS);
 }
 
 void remove_quitters(){
