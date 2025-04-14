@@ -8,7 +8,6 @@
 #define MAX_PLAYERS 8 
 #define INITIAL_CREDITS 100 // Can be provided by the user in the next iteration
 
-int player_quits[3] = {1, 0, 1}; // DEL
 static Player players[MAX_PLAYERS];  // players array private to the file (game.c)
 int player_count = 0;
 
@@ -19,9 +18,11 @@ void setup_game(){      // Ask number of players,names,assign credits
         player_count = get_integer_input("Enter number of players [2-8]: ");
     }while(player_count<2||player_count>MAX_PLAYERS);
     
-    for(int i=0;i<player_count;i++){
-        printf("Enter name for player %d: \n",i+1);
-        get_string_input("",players[i].name,sizeof(players[i].name));
+    for (int i = 0; i < player_count; i++) {
+        printf("Enter name for Player %d: ", i + 1);
+        get_string_input("", players[i].name, sizeof(players[i].name));
+        players[i].credits = INITIAL_CREDITS;
+        players[i].in_game = 1;
     }
     
     printf("Players enterd:\n");
@@ -31,30 +32,25 @@ void setup_game(){      // Ask number of players,names,assign credits
     
 }
 
-void remove_quitters(){    // Ask if players wnat to continue
+void remove_quitters(){
     for(int i=0;i<player_count;i++){
-        if (player_quits[i] == 1){
-            printf("Player %d has quit...BOOOOO!\n",i);
+        if(!players[i].in_game||players[i].credits <=0) continue;
+        printf("%s, do you want to quit ? (1= Yes,0= No):",players[i].name);
+        int choice = get_integer_input("");
+        if(choice == 1){
+            players[i].in_game = 0;
+            printf("%s has left the game.\n",players[i].name);
         }
     }
 }
 
 void play_hand(){ // Fake hand: randomly assign winner, transfer credits
-    // Enter 3 or more players so this does not break the array
-    player_count = 3;                                                          //Test# 1
-    players[0] = (Player){"Alice", 50, 1};                                     //Test# 1
-    players[1] = (Player){"Bob", 100, 1};                                      //Test# 1
-    players[2] = (Player){"Charlie", 75, 1};                                   //Test# 1
     printf("\n--- Starting a new (fake) hand ---\n");
 
     int winner = -1;
     do {
         winner = rand() % player_count; // pick random player
-        printf("Broke Fella: %d\n", players[winner].credits <= 0); // DEBUG     //Test# 1
-        printf("Broke Fella: %d\n", !players[winner].in_game);// DEBUG          //Test# 1
     } while (!players[winner].in_game || players[winner].credits <= 0);
-
-    printf("\n--- %s was the randomy selected winner ---\n",players[winner].name); // DEBUG
 
     int pot = 0;
 
@@ -80,7 +76,6 @@ void play_hand(){ // Fake hand: randomly assign winner, transfer credits
         if (players[i].in_game||players[i].credits<=0)continue;
             printf("%s now has %d credits\n", players[i].name, players[i].credits);
     }
-    exit(0);                                                    // DEBUG          //Test# 1
 }
 
 
@@ -92,6 +87,12 @@ int game_over(){
     return active <= 1;  
 }
 
-void show_final_message(){
-    printf("GAME OVER!");
+void show_final_message(){     // Print game over message
+    for (int i = 0; i < player_count; i++) {
+        if (players[i].in_game && players[i].credits > 0) {
+            printf("\n🎉 %s is the final winner with %d credits! 🎉\n", players[i].name, players[i].credits);
+            return;
+        }
+    }
+    printf("\nAll players have quit or lost. No winner this time!\n");
 }
