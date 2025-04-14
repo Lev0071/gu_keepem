@@ -9,7 +9,6 @@
 #define INITIAL_CREDITS 100 // Can be provided by the user in the next iteration
 
 int player_quits[3] = {1, 0, 1}; // DEL
-int gameOver = 0; // DEL
 static Player players[MAX_PLAYERS];  // players array private to the file (game.c)
 int player_count = 0;
 
@@ -32,8 +31,8 @@ void setup_game(){      // Ask number of players,names,assign credits
     
 }
 
-void remove_quitters(){
-    for(int i=0;i<sizeof(player_quits)/sizeof(player_quits[0]);i++){
+void remove_quitters(){    // Ask if players wnat to continue
+    for(int i=0;i<player_count;i++){
         if (player_quits[i] == 1){
             printf("Player %d has quit...BOOOOO!\n",i);
         }
@@ -78,7 +77,7 @@ void play_hand(){ // Fake hand: randomly assign winner, transfer credits
 
     printf("🏆 %s wins this round and collects %d credits!\n", players[winner].name, pot);
     for (int i = 0; i < player_count; i++) {
-        if (players[i].in_game)
+        if (players[i].in_game||players[i].credits<=0)continue;
             printf("%s now has %d credits\n", players[i].name, players[i].credits);
     }
     exit(0);                                                    // DEBUG          //Test# 1
@@ -86,7 +85,11 @@ void play_hand(){ // Fake hand: randomly assign winner, transfer credits
 
 
 int game_over(){
-    return gameOver;
+    int active = 0;
+    for(int i =0;i<player_count;i++){
+        if(players[i].in_game && players[i].credits > 0) active++; // as long as all players in the game have credit --> active
+    }
+    return active <= 1;  
 }
 
 void show_final_message(){
