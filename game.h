@@ -6,5 +6,6 @@ void play_hand();
 void remove_quitters();
 int game_over();
 void show_final_message();
+void run_prediction_round();
 
 #endif

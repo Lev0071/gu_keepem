@@ -54,6 +54,13 @@ void play_hand(){ // Fake hand: randomly assign winner, transfer credits
 
     int pot = 0;
 
+    printf("\n🃏 Dealing cards...\n");
+    for (int i = 0; i < player_count; i++) {
+        if (!players[i].in_game || players[i].credits <= 0) continue;
+            printf("%s's hand: [X][X]\n", players[i].name);
+    }
+
+    // deduct credits
     for (int i = 0; i < player_count; i++) {
         if (i == winner || !players[i].in_game || players[i].credits <= 0) continue;
         
@@ -72,10 +79,13 @@ void play_hand(){ // Fake hand: randomly assign winner, transfer credits
     players[winner].credits += pot;
 
     printf("🏆 %s wins this round and collects %d credits!\n", players[winner].name, pot);
+
+    printf("\n💰 Player Credits:\n");
+    printf("\n$$$$$$$$$$$$$$$$$$\n");
     for (int i = 0; i < player_count; i++) {
-        if (players[i].in_game||players[i].credits<=0)continue;
-            printf("%s now has %d credits\n", players[i].name, players[i].credits);
+        printf("%s: %d credits\n", players[i].name, players[i].credits);
     }
+    printf("$$$$$$$$$$$$$$$$$$\n");
 }
 
 
@@ -95,4 +105,8 @@ void show_final_message(){     // Print game over message
         }
     }
     printf("\nAll players have quit or lost. No winner this time!\n");
+}
+
+void run_prediction_round(){
+    // prediction logic
 }
