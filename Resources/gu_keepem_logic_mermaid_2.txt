@@ -1,0 +1,107 @@
+flowchart TD
+    A["Start Game"] --> B["Input number of players &#40;2-8&#41;"]
+    B --> C["Assign names and credits"]
+    C --> D{"Enough players to continue?"}
+    D -- No --> Z1["Game Ends<br>No winner"] --> END
+    D -- Yes --> E["Start New Hand"]
+
+    E --> F["Shuffle 52-card deck"]
+    F --> G["Deal 2 cards to each player"]
+    G --> H["Assign Small Guess & Big Guess"]
+
+    H --> I["Prediction Round 1"]
+    I --> PR1
+    PR1 --> J["Deal 3 community cards (flop)"]
+    J --> K["Prediction Round 2"]
+    K --> PR2
+    PR2 --> L["Deal 4th card (turn)"]
+    L --> M["Prediction Round 3"]
+    M --> PR3
+    PR3 --> N["Deal 5th card (river)"]
+    N --> O["Final Prediction Round"]
+    O --> PR4
+    PR4 --> P{"Only one player hasn't folded?"}
+    P -- Yes --> W["Give pot to last player"]
+    P -- No --> SCORE
+    SCORE --> POT
+    POT --> R["Update player credits"]
+    W --> R
+
+    R --> S["Remove players with 0 credits"]
+    S --> T{"Only 1 player left with credits?"}
+    T -- Yes --> Z["Game Ends<br>Winner declared"] --> END
+    T -- No --> U{"Players still want to continue?"}
+    U -- No --> Z1
+    U -- Yes --> CONT
+    CONT --> E
+
+    %% PLAYER PREDICTION LOOP
+    subgraph PR1["Player Prediction Loop"]
+        PP1["Player's Turn"]
+        PP1 --> PP2{"Choose Action"}
+        PP2 -- Predict / Call / Raise --> PP3["Add credits to pot"]
+        PP2 -- Fold --> PP4["Mark player as folded"]
+        PP3 --> PP5["Next player"]
+        PP4 --> PP5
+        PP5 --> PP6{"All matched or folded?"}
+        PP6 -- No --> PP1
+        PP6 -- Yes --> ENDROUND1[[End Prediction Round]]
+    end
+
+    subgraph PR2["Player Prediction Loop"]
+        PP1b["Player's Turn"]
+        PP1b --> PP2b{"Choose Action"}
+        PP2b -- Predict / Call / Raise --> PP3b["Add credits to pot"]
+        PP2b -- Fold --> PP4b["Mark player as folded"]
+        PP3b --> PP5b["Next player"]
+        PP4b --> PP5b
+        PP5b --> PP6b{"All matched or folded?"}
+        PP6b -- No --> PP1b
+        PP6b -- Yes --> ENDROUND2[[End Prediction Round]]
+    end
+
+    subgraph PR3["Player Prediction Loop"]
+        PP1c["Player's Turn"]
+        PP1c --> PP2c{"Choose Action"}
+        PP2c -- Predict / Call / Raise --> PP3c["Add credits to pot"]
+        PP2c -- Fold --> PP4c["Mark player as folded"]
+        PP3c --> PP5c["Next player"]
+        PP4c --> PP5c
+        PP5c --> PP6c{"All matched or folded?"}
+        PP6c -- No --> PP1c
+        PP6c -- Yes --> ENDROUND3[[End Prediction Round]]
+    end
+
+    subgraph PR4["Player Prediction Loop"]
+        PP1d["Player's Turn"]
+        PP1d --> PP2d{"Choose Action"}
+        PP2d -- Predict / Call / Raise --> PP3d["Add credits to pot"]
+        PP2d -- Fold --> PP4d["Mark player as folded"]
+        PP3d --> PP5d["Next player"]
+        PP4d --> PP5d
+        PP5d --> PP6d{"All matched or folded?"}
+        PP6d -- No --> PP1d
+        PP6d -- Yes --> ENDROUND4[[End Prediction Round]]
+    end
+
+    %% EVALUATE HANDS
+    subgraph SCORE["Evaluate Hands"]
+        EH1["For each player: build all 5-card combos from 7 cards"]
+        EH1 --> EH2["Score each combo using poker rules"]
+        EH2 --> EH3["Store best hand per player"]
+        EH3 --> EH4["Compare hands to determine winner(s)"]
+    end
+
+    %% DISTRIBUTE POT
+    subgraph POT["Distribute Pot"]
+        DP1["Check number of winners"]
+        DP1 -->|1 winner| DP2["Give all pot to winner"]
+        DP1 -->|Multiple winners| DP3["Split pot evenly"]
+    end
+
+    %% CONTINUATION CHECK
+    subgraph CONT["Check Player Continuation"]
+        PC1["Ask each player if they want to continue"]
+        PC1 --> PC2["Remove players who quit"]
+        PC2 --> PC3["Ensure at least 2 players remain"]
+    end

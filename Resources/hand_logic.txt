@@ -1,0 +1,12 @@
+flowchart TD
+    A["Start of Hand"] --> B["Shuffle 52-card deck"]
+    B --> C["Deal 2 hole cards to each player"]
+    C --> D["First Prediction Round (pre-flop)"]
+    D --> E["Deal 3 community cards (Flop)"]
+    E --> F["Second Prediction Round"]
+    F --> G["Deal 1 community card (Turn)"]
+    G --> H["Third Prediction Round"]
+    H --> I["Deal 1 final card (River)"]
+    I --> J["Final Prediction Round"]
+    J --> K["Community cards complete (5 cards total)"]
+    K --> L["Hand scoring (Best 5 of 7 cards)"]

@@ -1,0 +1,13 @@
+flowchart TD
+    A["Start Hand Scoring"] --> B["For each active player"]
+    B --> C["Create all 5-card combos from 7 total cards"]
+    C --> D["Evaluate combo using poker hand rankings"]
+    D --> E["Store best scoring combo"]
+    E --> F{"More players to check?"}
+    F -- Yes --> B
+    F -- No --> G["Compare best hands of all players"]
+    G --> H{"One clear winner?"}
+    H -- Yes --> I["Award full pot to winner"]
+    H -- No --> J["Split pot evenly among winners"]
+    I --> K["End of hand"]
+    J --> K

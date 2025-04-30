@@ -1,13 +1,16 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-typedef struct {
-    char name[50];
+#include "card.h"
+#include "status.h"
+
+typedef struct player {
+    char name[50]; // Name of player
     int credits;
     int in_game;         // 1 = playing, 0 = quit
     int current_bet;    // much they’ve assigned during the current hand.
-    //CardCollection hand;  // holds 2 cards
-    int status;         //  states: 0 = Out/Quit, 1 = Active, 2 = Folded.
+    Card hand[2];  // holds 2 cards
+    Status status;         //  states: 0 = Out/Quit, 1 = Active, 2 = Folded.
 } Player;
 
 void init_players(int count);

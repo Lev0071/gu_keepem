@@ -40,8 +40,15 @@ gcc -o gu_keepem main.c game.c player.c utils.c
 
 ### 🪟 On Windows (CMD or PowerShell)
 ```bash
-gcc -o gu_keepem.exe main.c game.c player.c utils.c
+Week1:
+gcc -o gu_keepem main.c game.c player.c utils.c
 gu_keepem.exe
+
+Week2:
+gcc -o gu_keepem main.c game.c player.c utils.c card.c
+
+``````
+
 ```
 
 Make sure you're in the same directory as the `.c` and `.h` files when compiling and running.
