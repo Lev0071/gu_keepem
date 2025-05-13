@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <h2>Mermaid Diagram Preview</h2>
+  <pre class="mermaid">
+    flowchart TD
+    A["Start Game"] --> B["Input number of players &#40;2-8&#41;"]
+    B --> C["Assign names and credits"]
+    C --> D{"Enough players to continue?"}
+    D -- No --> Z1["Game Ends<br>No winner"] --> END
+    D -- Yes --> E["Start New Hand"]
+
+    E --> F["Shuffle 52-card deck"]
+    F --> G["Deal 2 cards to each player"]
+    G --> H["Assign Small Guess & Big Guess"]
+
+    H --> I["Prediction Round 1 (Pre-Flop)"]
+    I --> PR1["PPL"]
+    PR1 --> J["Deal 3 community cards (flop)"]
+    J --> K["Prediction Round 2"]
+    K --> PR2["PPL"]
+    PR2 --> L["Deal 1 (4th) community card (turn)"]
+    L --> M["Prediction Round 3"]
+    M --> PR3["PPL"]
+    PR3 --> N["Deal 5th card (river)"]
+    N --> O["Final Prediction Round"]
+    O --> PR4["PPL"]
+    PR4 --> P{"Only one player hasn't folded?"}
+    P -- Yes --> W["Give pot to last player"]
+    P -- No --> SCORE
+    SCORE --> POT
+    POT --> R["Update player credits"]
+    W --> R
+
+    R --> S["Remove players with 0 credits"]
+    S --> T{"Only 1 player left with credits?"}
+    T -- Yes --> Z["Game Ends<br>Winner declared"] --> END
+    T -- No --> U{"Players still want to continue?"}
+    U -- No --> Z1
+    U -- Yes --> CONT
+    CONT --> E
+
+    %% EVALUATE HANDS
+    subgraph SCORE["Evaluate Hands"]
+        EH1["For each active player:"]
+        EH1 --> EH2["Create all 5 card combos from 7 total cards"]
+        EH2 --> EH3["Evaluate combos using player hand rankings"]
+        EH3 --> EH4["Store best scoring combo"]
+        EH4 --> EH5{"More players to check?"}
+        EH5 -- Yes --> EH1
+        EH5 -- No --> EH6["Compare best hands of all players"]
+    end
+
+    %% DISTRIBUTE POT
+    subgraph POT["Distribute Pot"]
+    DP1["Check number of winners"]
+    DP1 --> DP2{"One clear winner?"}
+    DP2 -- "Yes" --> DP3["Give all pot to winner"]
+    DP2 -- "No, multiple winners" --> DP4["Split pot evenly"]
+    end
+
+    %% CONTINUATION CHECK
+    subgraph CONT["Check Player Continuation"]
+        PC1["Ask each player if they want to continue"]
+        PC1 --> PC2["Remove players who quit"]
+        PC2 --> PC3["Ensure at least 2 players remain"]
+    end
+
+     %% PPL
+    subgraph PPL*["Player Prediction Loop (PPL)"]
+        KC1["Player's Turn"]
+        KC1 --> KC2{"Choose action"}
+        KC2 -- Predict/Call/Raise --> KC3["Allocate Credits to pot"]
+        KC2 -- Fold --> KC4["mark player as folded"]
+        KC3 -->KC7["Next Player"]
+        KC4 -->KC7["Next Player"]
+        KC7 -->KC8{"All matched or Folded"}
+        KC8 -- Yes --> KC9["End Prediction Round"]
+        KC8 -- No --> KC1
+    end
+
+    
+
+  </pre>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <h2>Mermaid Diagram Preview</h2>
+  <pre class="mermaid">
+flowchart TD
+    A["START of play_hand()"] --> B["1. Reset pot to 0"]
+    B --> C["2. deal_hole_cards()"]
+    C --> C1["Each player gets 2 private cards"]
+    C1 --> D["3. deal_community_cards()"]
+    D --> D1["Deal 5 community cards into table[5] secretly"]
+    D1 --> E["4. Show Players' Hands"]
+    E --> E1["Print each player's 2 cards"]
+    E1 --> F["5. Reveal FLOP"]
+    F --> F1["print_table_cards(3)"]
+    F1 --> F2["(Later: run_prediction_round())"]
+    F2 --> G["6. Reveal TURN"]
+    G --> G1["print_table_cards(4)"]
+    G1 --> G2["(Later: run_prediction_round())"]
+    G2 --> H["7. Reveal RIVER"]
+    H --> H1["print_table_cards(5)"]
+    H1 --> H2["(Later: run_prediction_round())"]
+    H2 --> I["8. Pick Winner"]
+    I --> I1["Randomly pick a player still in game"]
+    I1 --> J["9. Calculate Pot"]
+    J --> J1["Randomly deduct fake bets from other players"]
+    J1 --> K["10. Award Pot to Winner"]
+    K --> L["11. Show Updated Credits"]
+    L --> Z["END of play_hand()"]
+  </pre>
+</body>
+</html>

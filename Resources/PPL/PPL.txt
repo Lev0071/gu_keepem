@@ -1,0 +1,12 @@
+flowchart TD
+    subgraph PlayerPredictionLoop["Player Prediction Loop"]
+        PP1["Player's Turn"]
+        PP1 --> PP2{"Choose Action"}
+        PP2 -- Predict / Call / Raise --> PP3["Add credits to pot"]
+        PP2 -- Fold --> PP4["Mark player as folded"]
+        PP3 --> PP5["Next player"]
+        PP4 --> PP5
+        PP5 --> PP6{"All matched or folded?"}
+        PP6 -- No --> PP1
+        PP6 -- Yes --> PP_END[[End Prediction Round]]
+    end
