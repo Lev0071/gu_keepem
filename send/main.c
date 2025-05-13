@@ -14,5 +14,3 @@ int main() {
     show_final_message();
     return 0;
 }
-
-// gcc -o gu_keepem main.c game.c player.c utils.c card.c handscore.c

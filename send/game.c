@@ -268,28 +268,6 @@ void play_hand() {
     printf("$$$$$$$$$$$$$$$$$$\n");
 
     dealer_index = (dealer_index +1)%player_count;
-
-    printf("Table cards at the end:\n");
-    for(int i=0;i<5;i++){
-        print_card(table[i]);
-    }printf("\n");
-    for (int i = 0; i < player_count; i++) {
-        if (!players[i].in_game || players[i].credits <= 0) continue; // This line runs ONLY if the player is in the game AND has credits > 0
-        printf("%s's hand: ", players[i].name);
-        print_card(players[i].hand[0]);
-        printf(" ");
-        print_card(players[i].hand[1]);
-        printf("\n");
-    }
-    printf("Evaluate each players best hand\n");
-    for(int i=0;i<player_count;i++){
-        printf("Player %s had the best hand: ",players[i].name);
-        HandScore score = evaluate_best_hand(players[i].hand,table);
-        for (int j = 0; j < 5; j++) {
-            print_card(score.best_hand[j]);
-        }
-        printf("\n");
-    }
 }
 
 
