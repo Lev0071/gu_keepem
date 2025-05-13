@@ -24,7 +24,7 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
     }
 
     if (pair_rank) {
-        // Found a pair
+        /// Found a pair
         score.hand_rank = HAND_ONE_PAIR;
         score.main_values[0] = pair_rank;
 
