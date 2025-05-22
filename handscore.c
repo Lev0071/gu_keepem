@@ -1,3 +1,4 @@
+// handscore.c
 #include "handscore.h"
 #include "card.h"
 #include <stdlib.h>  // for qsort if needed
@@ -8,7 +9,7 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
     memset(&score, 0, sizeof(score));  // set everything to 0
 
     // Step 1: count ranks
-    int rank_count[15] = {0};  // index 2–14 (ACE=14)
+    int rank_count[15] = {0};  // index 2–14 (ACE=14)  // 0 & 1 not counted
 
     for (int i = 0; i < 5; i++) {
         rank_count[cards[i].rank]++;
@@ -17,7 +18,7 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
     // Step 2: search for a pair
     int pair_rank = 0;
     for (int r = 14; r >= 2; r--) {
-        if (rank_count[r] == 2) {
+        if (rank_count[r] == 2) { // If you have: K♠ K♦ 9♣ 5♥ 2♠ → pair_rank = 13 (King)
             pair_rank = r;
             break;
         }
@@ -26,7 +27,7 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
     if (pair_rank) {
         /// Found a pair
         score.hand_rank = HAND_ONE_PAIR;
-        score.main_values[0] = pair_rank;
+        score.main_values[0] = pair_rank; 
 
         // Add kickers (3 highest remaining)
         int kicker_index = 0;

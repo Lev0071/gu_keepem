@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <h2>Hand Evaluation and Comparison Logic</h2>
+  <pre class="mermaid">
+flowchart TD
+  A["evaluate_5_card_hand(Card[5])"] --> B["Count rank and suit frequencies"]
+  B --> C["Check for Straight + Flush"]
+  C -->|Yes| HR8["HAND_STRAIGHT_FLUSH"]
+  C -->|No| D["Check for Four of a Kind"]
+  D -->|Yes| HR7["HAND_FOUR_OF_A_KIND"]
+  D -->|No| E["Check for Full House"]
+  E -->|Yes| HR6["HAND_FULL_HOUSE"]
+  E -->|No| F["Check for Flush"]
+  F -->|Yes| HR5["HAND_FLUSH"]
+  F -->|No| G["Check for Straight"]
+  G -->|Yes| HR4["HAND_STRAIGHT"]
+  G -->|No| H["Check for Three of a Kind"]
+  H -->|Yes| HR3["HAND_THREE_OF_A_KIND"]
+  H -->|No| I["Check for Two Pair"]
+  I -->|Yes| HR2["HAND_TWO_PAIR"]
+  I -->|No| J["Check for One Pair"]
+  J -->|Yes| HR1["HAND_ONE_PAIR"]
+  J -->|No| HR0["HAND_HIGH_CARD"]
+
+  HR8 --> K["Set main_values, kicker_values, best_hand"]
+  HR7 --> K
+  HR6 --> K
+  HR5 --> K
+  HR4 --> K
+  HR3 --> K
+  HR2 --> K
+  HR1 --> K
+  HR0 --> K
+  K --> L["Return HandScore"]
+
+  %% Comparison Logic
+  M["compare_hand_scores(a, b)"] --> N["Compare hand_rank"]
+  N --> O{"Different?"}
+  O -- Yes --> P["Higher hand_rank wins"]
+  O -- No --> Q["Compare main_values[0..4]"]
+  Q --> R{"One higher?"}
+  R -- Yes --> S["Higher main_value wins"]
+  R -- No --> T["Compare kicker_values[0..4]"]
+  T --> U{"One higher?"}
+  U -- Yes --> V["Higher kicker wins"]
+  U -- No --> W["Hands are tied"]
+  </pre>
+</body>
+</html>

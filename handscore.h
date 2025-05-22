@@ -1,3 +1,4 @@
+// handscore.h
 #ifndef HAND_SCORE_H
 #define HAND_SCORE_H
 #include "card.h"
