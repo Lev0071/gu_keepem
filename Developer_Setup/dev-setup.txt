@@ -1,0 +1,6 @@
+git config --global user.name "Lev0071"
+git config --global user.email "coder0071@outlook.com"
+git config --global credential.helper manager
+
+git clone https://github.com/Lev0071/gu_keepem.git
+cd gu_keepem
