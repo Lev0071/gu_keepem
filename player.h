@@ -4,6 +4,7 @@
 #include "card.h"
 #include "playerStatus.h"
 #include "inGame.h"
+#include "handscore.h"
 
 
 typedef struct player {
@@ -13,6 +14,7 @@ typedef struct player {
     int current_bet;
     Card hand[2];
     PlayerStatus status;
+    HandScore best_score;
 } Player;
 
 
