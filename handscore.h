@@ -50,5 +50,6 @@ typedef struct handscore {
 HandScore evaluate_5_card_hand(Card cards[5]);
 HandScore evaluate_best_hand(Card hole[2], Card table[5]);
 int compare_hand_scores(HandScore a, HandScore b);
+int descending(const void *a, const void *b); // for qsort in evaluate_5_card_hand
 
 #endif // HAND_SCORE_H

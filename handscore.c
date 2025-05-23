@@ -4,18 +4,79 @@
 #include <stdlib.h>  // for qsort if needed
 #include <string.h> // for memset
 
+int descending_card_rank(const void *a, const void *b) {
+    Card *cardA = (Card *)a;
+    Card *cardB = (Card *)b;
+    return (cardB->rank - cardA->rank);
+}
+
 HandScore evaluate_5_card_hand(Card cards[5]) {
     HandScore score;
     memset(&score, 0, sizeof(score));  // set everything to 0
 
-    // Step 1: count ranks
+    // Step 1: count ranks and suits
     int rank_count[15] = {0};  // index 2–14 (ACE=14)  // 0 & 1 not counted
+    int suit_count[4] = {0};  // index 2–14 (ACE=14)  // 0 & 1 not counted
 
     for (int i = 0; i < 5; i++) {
         rank_count[cards[i].rank]++;
+        suit_count[cards[i].suit]++;
     }
 
-    // Step 2: search for a pair
+    // Step 2: sort cards in decending order
+    qsort(cards,5,sizeof(Card),descending_card_rank);
+
+
+    // Step 3 : search for each hand type
+
+    // Step 3.1 : search for Straight Flush or Royal Flush
+    // Step 3.1.1 : Is it a flush?
+    int flush_suit = -1;
+    for(int s=0;s<4;s++){
+        if(suit_count[s]==5){
+            flush_suit = s; // return one of  HEARTS(♥) = 0, DIAMONDS(♦) =1,CLUBS(♣)=2,SPADES(♠)=3
+            break;
+        }
+    }
+
+    int consecutive = 0;
+    for(int r=14;r>=2;r--){
+        if(rank_count[r]>0){
+            consecutive++;
+            if(consecutive == 5){
+                break;
+            }
+        }else{consecutive=0;}
+    }
+    int is_straight = (consecutive == 5);
+
+    // Step 3.1.2 : Is it a special case, Ace=1: A-2-3-4-5:
+    if(!is_straight && rank_count[14] == 1 && rank_count[2] == 1 && rank_count[3] == 1 && rank_count[4] == 1 && rank_count[5] == 1){
+        is_straight = 1;
+    }
+
+    if (flush_suit != -1 && is_straight){
+        score.hand_rank=HAND_STRAIGHT_FLUSH;
+        score.main_values[0] = cards[0].rank;
+        return score;
+    }
+
+    // Step 3.2 : search for Four of a Kind
+    for(int r=14;r>=2;r--){
+        if(rank_count[r]==4){
+            score.hand_rank=HAND_FOUR_OF_A_KIND;
+            score.main_values[0]=r;
+            for(int r2=14;r2>=2;r2--){
+                if(r2!=r && rank_count[r2]>0){
+                    score.kicker_values[0] = r2;
+                    break; // Only one kicker, save time
+                }
+            }
+            return score;
+        }
+    }
+
+    // Step 3.8 search for a pair
     int pair_rank = 0;
     for (int r = 14; r >= 2; r--) {
         if (rank_count[r] == 2) { // If you have: K♠ K♦ 9♣ 5♥ 2♠ → pair_rank = 13 (King)
@@ -62,12 +123,12 @@ HandScore evaluate_best_hand(Card hole[2], Card table[5]) {
     memcpy(&all[2], table, 5 * sizeof(Card));
 
     HandScore best_score;
-    memset(&best_score, 0, sizeof(best_score));
+    memset(&best_score, 0, sizeof(best_score)); // All elements of all members initialised to zero
 
     int combo[5];  // indices of selected cards
 
     // Generate all 21 combinations of 5 cards out of 7 (indices 0–6)
-    for (int a = 0; a < 3; a++) {
+    for (int a = 0; a < 3; a++) { // (7_5) = 21
         for (int b = a + 1; b < 4; b++) {
             for (int c = b + 1; c < 5; c++) {
                 for (int d = c + 1; d < 6; d++) {
