@@ -165,6 +165,37 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
         }
     }
 
+    // Step 3.6: search for Two Pair
+    int pair_one = 0;
+    int pair_two = 0;
+
+    for (int r = 14; r >= 2; r--) {
+        if (rank_count[r] == 2) {
+            if (pair_one == 0) {
+                pair_one = r;
+            } else if (pair_two == 0) {
+                pair_two = r;
+                break;  // Found two pairs, no need to continue
+            }
+        }
+    }
+
+    if (pair_one && pair_two) {
+        score.hand_rank = HAND_TWO_PAIR;
+        score.main_values[0] = pair_one > pair_two ? pair_one : pair_two;
+        score.main_values[1] = pair_one < pair_two ? pair_one : pair_two;
+
+        // Add one kicker (highest card not part of either pair)
+        for (int r = 14; r >= 2; r--) {
+            if (r != pair_one && r != pair_two && rank_count[r] > 0) {
+                score.kicker_values[0] = r;
+                break;
+            }
+        }
+
+        return score;
+    }
+
     // Step 3.8 search for a pair
     int pair_rank = 0;
     for (int r = 14; r >= 2; r--) {
