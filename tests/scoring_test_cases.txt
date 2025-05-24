@@ -1,0 +1,66 @@
+==== Hand Evaluation Test Checklist ====
+
+1. STRAIGHT FLUSH
+------------------
+- Normal Straight Flush (e.g., 5♠–9♠)
+- Royal Flush (10♠ J♠ Q♠ K♠ A♠)
+- Ace-low Straight Flush (A♠ 2♠ 3♠ 4♠ 5♠)
+
+2. FOUR OF A KIND
+------------------
+- Four cards of same rank (e.g., 9♣ 9♦ 9♥ 9♠ + kicker)
+- Tiebreaker test: compare two 4-of-a-kinds with different ranks
+- Tiebreaker kicker test: same 4-of-a-kind rank, different kicker
+
+3. FULL HOUSE
+-------------
+- Standard Full House: 3 of a kind + pair (e.g., Q♠ Q♣ Q♥ + 9♦ 9♣)
+- Tiebreaker: same trips, different pair
+- Tiebreaker: different trips
+
+4. FLUSH
+--------
+- Normal Flush (e.g., A♥ 10♥ 8♥ 6♥ 2♥)
+- Tiebreaker: flush vs flush with higher kicker
+
+5. STRAIGHT
+-----------
+- Normal Straight (e.g., 6♠ 7♥ 8♦ 9♣ 10♠)
+- Ace-low Straight (A♠ 2♦ 3♣ 4♠ 5♦)
+- Ace-high Straight (10♥ J♠ Q♦ K♣ A♠)
+
+6. THREE OF A KIND
+------------------
+- Basic Trips (e.g., 8♠ 8♣ 8♦ + two unrelated cards)
+- Tiebreaker: higher kicker wins if trips are same
+- Tiebreaker: compare different trip ranks
+
+7. TWO PAIR
+-----------
+- Standard Two Pair (e.g., Q♣ Q♥ + 4♠ 4♦)
+- Tiebreaker: higher pair, then lower pair, then kicker
+- Edge case: Two pair from hand vs one pair on board
+
+8. ONE PAIR
+-----------
+- Basic Pair (e.g., two 9s + 3 kickers)
+- Tiebreaker: kicker comparisons
+- Edge case: Pair on board vs higher pair in hand
+
+9. HIGH CARD
+------------
+- No combination (e.g., A♠ 10♣ 9♦ 4♠ 2♥)
+- Tiebreaker: descending rank comparison
+
+10. MIXED BEST HANDS
+---------------------
+- Best 5 from board only
+- Best 5 mixed from hole + board
+- Best 5 from hole only
+
+11. IGNORE JUNK
+---------------
+- Junk cards should not affect result
+- Ensure best 5-card combo is selected even with distracting cards
+
+========================================
