@@ -149,6 +149,22 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
         score.main_values[0]=cards[0].rank;
     }
 
+    // Step 3.6 : search for Three of a Kind
+    int index = 0;
+    for(int r=14;r>=2;r--){
+        if(rank_count[r]==3){
+            score.hand_rank=HAND_THREE_OF_A_KIND;
+            score.main_values[0]=r;
+            for(int r2=14;r2>=2;r2--){
+                if(r2!=r && rank_count[r2]>0 && index < 2){
+                    score.kicker_values[index] = r2;
+                    index++; // // Two kickers
+                }
+            }
+            return score;
+        }
+    }
+
     // Step 3.8 search for a pair
     int pair_rank = 0;
     for (int r = 14; r >= 2; r--) {
