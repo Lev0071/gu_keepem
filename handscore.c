@@ -76,6 +76,79 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
         }
     }
 
+    // Step 3.3 : search for Full House hand
+    int is_trip_rank = 0;
+    int is_pair_rank = 0;
+    for(int r=14;r>=2;r--){
+        if(rank_count[r]==3){
+            is_trip_rank = r;
+        }
+        if(rank_count[r]==2){
+            is_pair_rank = r;
+        }
+    }
+    if(is_trip_rank && is_pair_rank){
+        score.hand_rank=HAND_FULL_HOUSE;
+        score.main_values[0]=is_trip_rank;
+        score.main_values[1]=is_pair_rank;
+        return score;
+    }
+
+    // Step 3.4 : Flush?
+    flush_suit = -1;
+    for(int s=0;s<4;s++){
+        if(suit_count[s]==5){
+            flush_suit = s; // return one of  HEARTS(♥) = 0, DIAMONDS(♦) =1,CLUBS(♣)=2,SPADES(♠)=3
+            break;
+        }
+    }
+    if(flush_suit != -1){
+        score.hand_rank = HAND_FLUSH;
+        for (int i = 0; i < 5; i++) {
+            score.main_values[i] = cards[i].rank;
+        }
+        return score;
+    }
+
+    // Step 3.5 : Straight?
+    consecutive = 0;
+    is_straight = 0;
+    int high_card_of_straight = 0;
+    for(int r=14;r>=2;r--){
+        if(rank_count[r]>0){
+            consecutive++;
+            if(consecutive == 5){
+                is_straight =1;
+                    if(rank_count[r]==1){
+                        high_card_of_straight = r;
+                        break;
+                    }
+            }
+        }else{consecutive=0;}
+    }
+
+    // Special case: A-2-3-4-5
+    if(is_straight != 1 && rank_count[14]==1 && rank_count[2]==1 && rank_count[3]==1 && rank_count[4]==1 && rank_count[14]==1){
+        is_straight =1;
+        high_card_of_straight = 5;
+    }
+
+    if(is_straight){
+        score.hand_rank = HAND_STRAIGHT;
+        score.main_values[0] = high_card_of_straight;
+        return score;
+    }
+
+    // Step 3.5.2 : Is it a special case, Ace=1: A-K-Q-J-10:
+    is_straight = (consecutive == 5);
+    if(!is_straight && rank_count[14] == 1 && rank_count[13] == 1 && rank_count[12] == 1 && rank_count[11] == 1 && rank_count[10] == 1){
+        is_straight = 1;
+    }
+    if(is_straight && consecutive == 5){
+        score.hand_rank=HAND_STRAIGHT;
+        score.main_values[0]=cards[0].rank;
+    }
+
     // Step 3.8 search for a pair
     int pair_rank = 0;
     for (int r = 14; r >= 2; r--) {
@@ -179,3 +252,16 @@ int compare_hand_scores(HandScore a, HandScore b) {
 
 //     return score;
 // }
+
+// -HAND_STRAIGHT_FLUSH
+// -HAND_FOUR_OF_A_KIND
+// -HAND_FULL_HOUSE
+// -HAND_HIGH_CARD
+// -HAND_ONE_PAIR
+// -HAND_FLUSH
+
+
+
+// HAND_TWO_PAIR
+// HAND_THREE_OF_A_KIND
+// HAND_STRAIGHT
