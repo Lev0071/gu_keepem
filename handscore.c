@@ -119,16 +119,14 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
             consecutive++;
             if(consecutive == 5){
                 is_straight =1;
-                    if(rank_count[r]==1){
-                        high_card_of_straight = r;
-                        break;
-                    }
+                high_card_of_straight = r + 4; // currently r is pointing to the lowest of the straights
+                break;
             }
         }else{consecutive=0;}
     }
 
     // Special case: A-2-3-4-5
-    if(is_straight != 1 && rank_count[14]==1 && rank_count[2]==1 && rank_count[3]==1 && rank_count[4]==1 && rank_count[14]==1){
+    if(!is_straight && rank_count[14]==1 && rank_count[2]==1 && rank_count[3]==1 && rank_count[4]==1 && rank_count[5]==1){
         is_straight =1;
         high_card_of_straight = 5;
     }
@@ -139,15 +137,6 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
         return score;
     }
 
-    // Step 3.5.2 : Is it a special case, Ace=1: A-K-Q-J-10:
-    is_straight = (consecutive == 5);
-    if(!is_straight && rank_count[14] == 1 && rank_count[13] == 1 && rank_count[12] == 1 && rank_count[11] == 1 && rank_count[10] == 1){
-        is_straight = 1;
-    }
-    if(is_straight && consecutive == 5){
-        score.hand_rank=HAND_STRAIGHT;
-        score.main_values[0]=cards[0].rank;
-    }
 
     // Step 3.6 : search for Three of a Kind
     int index = 0;
@@ -196,7 +185,7 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
         return score;
     }
 
-    // Step 3.8 search for a pair
+    // Step 3.7 search for a pair
     int pair_rank = 0;
     for (int r = 14; r >= 2; r--) {
         if (rank_count[r] == 2) { // If you have: K♠ K♦ 9♣ 5♥ 2♠ → pair_rank = 13 (King)
