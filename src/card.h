@@ -34,5 +34,6 @@ typedef struct card {
 void init_deck(Card *deck, int *deck_size); // Initialize a 52-card deck in order
 void shuffle_deck(Card *deck, int deck_size); // Randomly shuffle a deck of cards
 void print_card(Card card); // Print a card like "J♥" or "10♣"
+const char* get_rank_name(int rank);
 
 #endif // CARD_H

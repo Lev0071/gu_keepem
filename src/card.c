@@ -59,3 +59,22 @@ void print_card(Card card) {
     // Ranks start from 2 → rank - 2 gives correct index
     printf("%s%s", rank_names[card.rank - 2], suit_symbols[card.suit]);
 }
+
+const char* get_rank_name(int rank) {
+    switch(rank) {
+        case 14: return "Ace";
+        case 13: return "King";
+        case 12: return "Queen";
+        case 11: return "Jack";
+        case 10: return "Ten";
+        case 9: return "Nine";
+        case 8: return "Eight";
+        case 7: return "Seven";
+        case 6: return "Six";
+        case 5: return "Five";
+        case 4: return "Four";
+        case 3: return "Three";
+        case 2: return "Two";
+        default: return "?";
+    }
+}
