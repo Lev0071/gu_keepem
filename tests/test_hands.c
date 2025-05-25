@@ -247,11 +247,11 @@ void test_straight() {
 
 void test_ace_low_straight() {
     Card hole[2] = {
-        {ACE, CLUB},
+        {ACE, CLUBS},
         {TWO, DIAMONDS}
     };
     Card table[5] = {
-        {THREE, SPADE},
+        {THREE, SPADES},
         {FOUR, HEARTS},
         {FIVE, DIAMONDS},
         {NINE, HEARTS},  
@@ -325,27 +325,6 @@ void three_of_a_kind_tiebreaker_sameTrips_higherKicker() {
     printf("✅ Passed: three_of_a_kind()\n");
 }
 
-void three_of_a_kind_tiebreaker_sameTrips_higherKicker() {
-    Card hole[2] = {
-        {EIGHT, SPADES},
-        {EIGHT, CLUBS}
-    };
-    Card table[5] = {
-        {EIGHT, DIAMONDS},
-        {ACE, SPADES},
-        {KING, HEARTS},
-        {FIVE, CLUBS},
-        {TWO, DIAMONDS}
-    };
-
-    HandScore result = evaluate_best_hand(hole, table);
-    assert(result.hand_rank == HAND_THREE_OF_A_KIND);
-    assert(result.main_values[0] == EIGHT);
-    assert(result.kicker_values[0] == ACE);
-    assert(result.kicker_values[0] == KING);
-    printf("✅ Passed: three_of_a_kind()\n");
-}
-
 void three_of_a_kind_tiebreaker_differentTrips() {
     Card hole[2] = {
         {SEVEN, SPADES},
@@ -381,7 +360,7 @@ void two_pair() {
     };
 
     HandScore result = evaluate_best_hand(hole, table);
-    assert(result.hand_rank == HAND_THREE_OF_A_KIND);
+    assert(result.hand_rank == HAND_TWO_PAIR);
     assert(result.main_values[0] == QUEEN);
     assert(result.main_values[1] == FOUR);
     assert(result.kicker_values[0] == NINE);
@@ -402,7 +381,7 @@ void two_pair_higher_pair() {
     };
 
     HandScore result = evaluate_best_hand(hole, table);
-    assert(result.hand_rank == HAND_THREE_OF_A_KIND);
+    assert(result.hand_rank == HAND_TWO_PAIR);
     assert(result.main_values[0] == QUEEN);
     assert(result.main_values[1] == FOUR);
     assert(result.kicker_values[0] == NINE);
@@ -423,13 +402,212 @@ void two_pair_EdgeCase_Two_pair_from_board() {
     };
 
     HandScore result = evaluate_best_hand(hole, table);
-    assert(result.hand_rank == HAND_THREE_OF_A_KIND);
+    assert(result.hand_rank == HAND_TWO_PAIR);
     assert(result.main_values[0] == NINE);
     assert(result.main_values[1] == THREE);
     assert(result.kicker_values[0] == ACE);
     printf("✅ Passed: two_pair_EdgeCase_Two_pair_from_board()\n");
 }
 
+void one_pair() {
+    Card hole[2] = {
+        {NINE, HEARTS},
+        {NINE, DIAMONDS}
+    };
+    Card table[5] = {
+        {KING, SPADES},
+        {JACK, HEARTS},
+        {SIX, DIAMONDS},
+        {TWO, HEARTS},
+        {FOUR, SPADES}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_ONE_PAIR);
+    assert(result.main_values[0] == NINE);
+    assert(result.kicker_values[0] == KING);
+    assert(result.kicker_values[0] == JACK);
+    assert(result.kicker_values[0] == SIX);
+    printf("✅ Passed: one_pair()\n");
+}
+
+void one_pair_kicker_comparison() {
+    Card hole[2] = {
+        {NINE, HEARTS},
+        {NINE, DIAMONDS}
+    };
+    Card table[5] = {
+        {ACE, SPADES},
+        {QUEEN, SPADES},
+        {TEN, DIAMONDS},
+        {TWO, CLUBS},
+        {THREE, HEARTS}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_ONE_PAIR);
+    assert(result.main_values[0] == NINE);
+    assert(result.kicker_values[0] == ACE);
+    assert(result.kicker_values[0] == QUEEN);
+    assert(result.kicker_values[0] == TEN);
+    printf("✅ Passed: one_pair_kicker_comparison()\n");
+}
+
+void one_pair_BoardPair_vs_HolePair() {
+    Card hole[2] = {
+        {QUEEN, SPADES},
+        {TEN, CLUBS}
+    };
+    Card table[5] = {
+        {JACK, SPADES},
+        {JACK, HEARTS},
+        {FIVE, DIAMONDS},
+        {TWO, DIAMONDS},
+        {THREE, SPADES}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_ONE_PAIR);
+    assert(result.main_values[0] == JACK);
+    assert(result.kicker_values[0] == QUEEN);
+    assert(result.kicker_values[0] == TEN);
+    assert(result.kicker_values[0] == FIVE);
+    printf("✅ Passed: one_pair_BoardPair_vs_HolePair()\n");
+}
+
+void high_card() {
+    Card hole[2] = {
+        {ACE, SPADES},
+        {TEN, CLUBS}
+    };
+    Card table[5] = {
+        {NINE, DIAMONDS},
+        {FOUR, SPADES},
+        {TWO, HEARTS},
+        {SIX, HEARTS},
+        {EIGHT, CLUBS}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_HIGH_CARD);
+    assert(result.main_values[0] == ACE);
+    assert(result.main_values[1] == TEN);
+    assert(result.main_values[2] == NINE);
+    assert(result.main_values[3] == EIGHT);
+    assert(result.main_values[4] == SIX);
+    printf("✅ Passed: high_card()\n");
+}
+
+void high_card_tiebreaker_descending_ranks() {
+    Card hole[2] = {
+        {KING, SPADES},
+        {NINE, HEARTS}
+    };
+    Card table[5] = {
+        {JACK, DIAMONDS},
+        {EIGHT, CLUBS},
+        {FIVE, SPADES},
+        {FOUR, DIAMONDS},
+        {TWO, CLUBS}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_HIGH_CARD);
+    assert(result.main_values[0] == KING);
+    assert(result.main_values[1] == JACK);
+    assert(result.main_values[2] == NINE);
+    assert(result.main_values[3] == EIGHT);
+    assert(result.main_values[4] == FIVE);
+    printf("✅ Passed: high_card_tiebreaker_descending_ranks()\n");
+}
+
+void mixed_best_hand_best_5_from_board() {
+    Card hole[2] = {
+        {TWO, SPADES},
+        {THREE, CLUBS}
+    };
+    Card table[5] = {
+        {ACE, SPADES},
+        {KING, SPADES},
+        {QUEEN, SPADES},
+        {JACK, SPADES},
+        {TEN, SPADES}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_HIGH_CARD);
+    assert(result.main_values[0] == ACE);
+    assert(result.main_values[1] == KING);
+    assert(result.main_values[2] == QUEEN);
+    assert(result.main_values[3] == JACK);
+    assert(result.main_values[4] == TEN);
+    printf("✅ Passed: mixed_best_hand_best_5_from_board()\n");
+}
+
+void mixed_best_hand_best_5_from_board() {
+    Card hole[2] = {
+        {TWO, SPADES},
+        {THREE, CLUBS}
+    };
+    Card table[5] = {
+        {ACE, SPADES},
+        {KING, SPADES},
+        {QUEEN, SPADES},
+        {JACK, SPADES},
+        {TEN, SPADES}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_HIGH_CARD);
+    assert(result.main_values[0] == ACE);
+    assert(result.main_values[1] == KING);
+    assert(result.main_values[2] == QUEEN);
+    assert(result.main_values[3] == JACK);
+    assert(result.main_values[4] == TEN);
+    printf("✅ Passed: mixed_best_hand_best_5_from_board()\n");
+}
+
+void mixed_best_hand_best_5_from_hole() {
+    Card hole[2] = {
+        {ACE, SPADES},
+        {KING, SPADES}
+    };
+    Card table[5] = {
+        {TWO, SPADES},
+        {THREE, DIAMONDS},
+        {FIVE, HEARTS},
+        {SEVEN, CLUBS},
+        {NINE, DIAMONDS}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_HIGH_CARD);
+    assert(result.main_values[0] == ACE);
+    assert(result.main_values[1] == KING);
+    assert(result.main_values[2] == NINE);
+    assert(result.main_values[3] == SEVEN);
+    assert(result.main_values[4] == FIVE);
+    printf("✅ Passed: mixed_best_hand_best_5_from_hole()\n");
+}
+
+void mixed_best_hand_best_5_mixed() {
+    Card hole[2] = {
+        {QUEEN, SPADES},
+        {TEN, SPADES}
+    };
+    Card table[5] = {
+        {JACK, SPADES},
+        {NINE, SPADES},
+        {EIGHT, SPADES},
+        {TWO, CLUBS},
+        {THREE, DIAMONDS}
+    };
+
+    HandScore result = evaluate_best_hand(hole, table);
+    assert(result.hand_rank == HAND_STRAIGHT_FLUSH);
+    assert(result.main_values[0] == QUEEN);
+    printf("✅ Passed: mixed_best_hand_best_5_mixed()\n");
+}
 
 int main(){
     printf("###### TEST HAND EVALUATION ###### == START\n");
@@ -464,6 +642,13 @@ int main(){
     one_pair();
     one_pair_kicker_comparison();
     one_pair_BoardPair_vs_HolePair();
+    printf("Testing High card cases...\n");
+    high_card();
+    high_card_tiebreaker_descending_ranks();
+    printf("Testing mixed best hand cases...\n");
+    mixed_best_hand_best_5_from_board();
+    mixed_best_hand_best_5_from_hole();
+    mixed_best_hand_best_5_mixed();
     printf("###### TEST HAND EVALUATION ###### == END\n");
 }
 
