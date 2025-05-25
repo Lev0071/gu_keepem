@@ -31,6 +31,8 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
 
     // Step 3.1 : search for Straight Flush or Royal Flush
     // Step 3.1.1 : Is it a flush?
+    int high_card_of_straight = 0;
+
     int flush_suit = -1;
     for(int s=0;s<4;s++){
         if(suit_count[s]==5){
@@ -50,14 +52,25 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
     }
     int is_straight = (consecutive == 5);
 
+    if (is_straight) {
+    // Find the highest card in the straight
+    for (int r = 14; r >= 5; r--) {
+        if (rank_count[r] && rank_count[r-1] && rank_count[r-2] && rank_count[r-3] && rank_count[r-4]) {
+            high_card_of_straight = r;
+            break;
+        }
+    }
+}
+
     // Step 3.1.2 : Is it a special case, Ace=1: A-2-3-4-5:
     if(!is_straight && rank_count[14] == 1 && rank_count[2] == 1 && rank_count[3] == 1 && rank_count[4] == 1 && rank_count[5] == 1){
         is_straight = 1;
+        high_card_of_straight = 5;
     }
 
     if (flush_suit != -1 && is_straight){
         score.hand_rank=HAND_STRAIGHT_FLUSH;
-        score.main_values[0] = cards[0].rank;
+        score.main_values[0] = high_card_of_straight;
         return score;
     }
 
@@ -113,7 +126,7 @@ HandScore evaluate_5_card_hand(Card cards[5]) {
     // Step 3.5 : Straight?
     consecutive = 0;
     is_straight = 0;
-    int high_card_of_straight = 0;
+    high_card_of_straight = 0;
     for(int r=14;r>=2;r--){
         if(rank_count[r]>0){
             consecutive++;
