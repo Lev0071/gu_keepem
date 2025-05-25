@@ -300,7 +300,7 @@ void three_of_a_kind() {
     assert(result.hand_rank == HAND_THREE_OF_A_KIND);
     assert(result.main_values[0] == EIGHT);
     assert(result.kicker_values[0] == TEN);
-    assert(result.kicker_values[0] == SIX);
+    assert(result.kicker_values[1] == SIX);
     printf("✅ Passed: three_of_a_kind()\n");
 }
 
@@ -321,7 +321,7 @@ void three_of_a_kind_tiebreaker_sameTrips_higherKicker() {
     assert(result.hand_rank == HAND_THREE_OF_A_KIND);
     assert(result.main_values[0] == EIGHT);
     assert(result.kicker_values[0] == ACE);
-    assert(result.kicker_values[0] == KING);
+    assert(result.kicker_values[1] == KING);
     printf("✅ Passed: three_of_a_kind()\n");
 }
 
@@ -342,7 +342,7 @@ void three_of_a_kind_tiebreaker_differentTrips() {
     assert(result.hand_rank == HAND_THREE_OF_A_KIND);
     assert(result.main_values[0] == SEVEN);
     assert(result.kicker_values[0] == ACE);
-    assert(result.kicker_values[0] == QUEEN);
+    assert(result.kicker_values[1] == QUEEN);
     printf("✅ Passed: three_of_a_kind()\n");
 }
 
@@ -426,8 +426,8 @@ void one_pair() {
     assert(result.hand_rank == HAND_ONE_PAIR);
     assert(result.main_values[0] == NINE);
     assert(result.kicker_values[0] == KING);
-    assert(result.kicker_values[0] == JACK);
-    assert(result.kicker_values[0] == SIX);
+    assert(result.kicker_values[1] == JACK);
+    assert(result.kicker_values[2] == SIX);
     printf("✅ Passed: one_pair()\n");
 }
 
@@ -448,8 +448,8 @@ void one_pair_kicker_comparison() {
     assert(result.hand_rank == HAND_ONE_PAIR);
     assert(result.main_values[0] == NINE);
     assert(result.kicker_values[0] == ACE);
-    assert(result.kicker_values[0] == QUEEN);
-    assert(result.kicker_values[0] == TEN);
+    assert(result.kicker_values[1] == QUEEN);
+    assert(result.kicker_values[2] == TEN);
     printf("✅ Passed: one_pair_kicker_comparison()\n");
 }
 
@@ -470,8 +470,8 @@ void one_pair_BoardPair_vs_HolePair() {
     assert(result.hand_rank == HAND_ONE_PAIR);
     assert(result.main_values[0] == JACK);
     assert(result.kicker_values[0] == QUEEN);
-    assert(result.kicker_values[0] == TEN);
-    assert(result.kicker_values[0] == FIVE);
+    assert(result.kicker_values[1] == TEN);
+    assert(result.kicker_values[2] == FIVE);
     printf("✅ Passed: one_pair_BoardPair_vs_HolePair()\n");
 }
 
@@ -535,35 +535,8 @@ void mixed_best_hand_best_5_from_board() {
     };
 
     HandScore result = evaluate_best_hand(hole, table);
-    assert(result.hand_rank == HAND_HIGH_CARD);
+    assert(result.hand_rank == HAND_STRAIGHT_FLUSH);
     assert(result.main_values[0] == ACE);
-    assert(result.main_values[1] == KING);
-    assert(result.main_values[2] == QUEEN);
-    assert(result.main_values[3] == JACK);
-    assert(result.main_values[4] == TEN);
-    printf("✅ Passed: mixed_best_hand_best_5_from_board()\n");
-}
-
-void mixed_best_hand_best_5_from_board() {
-    Card hole[2] = {
-        {TWO, SPADES},
-        {THREE, CLUBS}
-    };
-    Card table[5] = {
-        {ACE, SPADES},
-        {KING, SPADES},
-        {QUEEN, SPADES},
-        {JACK, SPADES},
-        {TEN, SPADES}
-    };
-
-    HandScore result = evaluate_best_hand(hole, table);
-    assert(result.hand_rank == HAND_HIGH_CARD);
-    assert(result.main_values[0] == ACE);
-    assert(result.main_values[1] == KING);
-    assert(result.main_values[2] == QUEEN);
-    assert(result.main_values[3] == JACK);
-    assert(result.main_values[4] == TEN);
     printf("✅ Passed: mixed_best_hand_best_5_from_board()\n");
 }
 
