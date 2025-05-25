@@ -3,6 +3,44 @@
 #include "card.h"
 #include <stdlib.h>  // for qsort if needed
 #include <string.h> // for memset
+#include "config.h"
+
+// ✅ Function name mismatch fixed
+// ✅ Typo in printf fixed
+// ✅ Added printing of kickers (for completeness)
+
+const char* get_hand_rank_name(int rank) {
+    switch (rank) {
+        case HAND_STRAIGHT_FLUSH:   return "Straight Flush";
+        case HAND_FOUR_OF_A_KIND:   return "Four of a Kind";
+        case HAND_FULL_HOUSE:       return "Full House";
+        case HAND_FLUSH:            return "Flush";
+        case HAND_STRAIGHT:         return "Straight";
+        case HAND_THREE_OF_A_KIND:  return "Three of a Kind";
+        case HAND_TWO_PAIR:         return "Two Pair";
+        case HAND_ONE_PAIR:         return "One Pair";
+        case HAND_HIGH_CARD:        return "High Card";
+        default:                    return "Unknown Hand";
+    }
+}
+
+void print_hand_score(HandScore s) {
+    printf("🂠 Hand Type: %s\n", get_hand_rank_name(s.hand_rank));
+
+    printf("  ➤ Main values: ");
+    for (int i = 0; i < 5; i++) {
+        if (s.main_values[i] > 0)
+            printf("%d ", s.main_values[i]);
+    }
+
+    printf("\n  ➤ Kickers: ");
+    for (int i = 0; i < 5; i++) {
+        if (s.kicker_values[i] > 0)
+            printf("%d ", s.kicker_values[i]);
+    }
+
+    printf("\n");
+}
 
 int descending_card_rank(const void *a, const void *b) {
     Card *cardA = (Card *)a;
@@ -257,6 +295,9 @@ HandScore evaluate_best_hand(Card hole[2], Card table[5]) {
                     for (int e = d + 1; e < 7; e++) {
                         Card hand[5] = { all[a], all[b], all[c], all[d], all[e] };
                         HandScore score = evaluate_5_card_hand(hand);
+                        #if DEBUG
+                            print_hand_score(score);
+                        #endif
 
                         // First run or if this score is better
                         if (best_score.hand_rank < score.hand_rank ||
@@ -275,6 +316,9 @@ HandScore evaluate_best_hand(Card hole[2], Card table[5]) {
 }
 
 int compare_hand_scores(HandScore a, HandScore b) {
+    if (a.hand_rank > b.hand_rank) return 1;
+    if (a.hand_rank < b.hand_rank) return -1;
+    
     for (int i = 0; i < 5; i++) {
         if (a.main_values[i] > b.main_values[i]) return 1;
         if (a.main_values[i] < b.main_values[i]) return -1;
