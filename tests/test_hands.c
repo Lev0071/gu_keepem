@@ -638,7 +638,7 @@ int main(){
 //   ../src/game.c ../src/handscore.c ^
 //   -I../src
 
-// gcc -o run_tests test_hands.c ../src/card.c ../src/player.c ../src/utils.c ../src/game.c ../src/handscore.c -I../src
+// gcc -o run_hands_test.exe test_hands.c ../src/card.c ../src/player.c ../src/utils.c ../src/game.c ../src/handscore.c -I../src
 
 
 // run_tests.exe
