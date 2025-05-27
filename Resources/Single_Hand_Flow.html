@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <h2>Mermaid Diagram Preview</h2>
+  <pre class="mermaid">
+    flowchart TD
+    A[Start New Hand] --> B[Reset pot to 0]
+    B --> C[Shuffle and Deal Cards]
+    C --> D[Assign Small and Big Guess]
+    D --> E[Prediction Round 1 - Pre-Flop]
+    E --> F{Only 1 player remains}
+    F -- Yes --> G[Give pot to last player] --> Z[End Hand]
+    F -- No --> H[Deal 3 Community Cards - Flop]
+    H --> I[Prediction Round 2 - Post-Flop]
+    I --> J{Only 1 player remains}
+    J -- Yes --> G
+    J -- No --> K[Deal 4th Community Card - Turn]
+    K --> L[Prediction Round 3 - Post-Turn]
+    L --> M{Only 1 player remains}
+    M -- Yes --> G
+    M -- No --> N[Deal 5th Community Card - River]
+    N --> O[Final Prediction Round]
+    O --> P{Only 1 player remains}
+    P -- Yes --> G
+    P -- No --> Q[Evaluate Hands of All Active Players]
+    Q --> R[Determine Winning Hand or Tie]
+    R --> S[Distribute Pot to Winner or Split]
+    S --> T[Update Player Credits]
+    T --> U[Eliminate Players with 0 Credits]
+    U --> Z[End Hand]
+
+
+  </pre>
+</body>
+</html>
