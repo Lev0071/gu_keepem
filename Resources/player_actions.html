@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mermaid Diagram</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <h2>Mermaid Diagram Preview</h2>
+  <pre class="mermaid">
+    flowchart TD
+    Start[Start Hand] --> PreFlop[Pre-Flop: Deal Hole Cards]
+    PreFlop --> P1[Prediction Round 1]
+    P1 -->|Current bet = 0| Predict1[Allow Predict]
+    P1 -->|Current bet > 0| Call1[Allow Call]
+    P1 --> Raise1[Allow Raise if enough credits]
+    P1 --> AllIn1[Allow All-in if short on credits]
+    P1 --> Fold1[Allow Fold anytime]
+
+    P1 --> Flop[Flop: Reveal 3 Cards]
+    Flop --> P2[Prediction Round 2]
+    P2 -->|Current bet = 0| Predict2[Allow Predict]
+    P2 -->|Current bet > 0| Call2[Allow Call]
+    P2 --> Raise2[Allow Raise if enough credits]
+    P2 --> AllIn2[Allow All-in if short on credits]
+    P2 --> Fold2[Allow Fold anytime]
+
+    P2 --> Turn[Turn: Reveal 4th Card]
+    Turn --> P3[Prediction Round 3]
+    P3 -->|Current bet = 0| Predict3[Allow Predict]
+    P3 -->|Current bet > 0| Call3[Allow Call]
+    P3 --> Raise3[Allow Raise if enough credits]
+    P3 --> AllIn3[Allow All-in if short on credits]
+    P3 --> Fold3[Allow Fold anytime]
+
+    P3 --> River[River: Reveal 5th Card]
+    River --> P4[Prediction Round 4]
+    P4 -->|Current bet = 0| Predict4[Allow Predict]
+    P4 -->|Current bet > 0| Call4[Allow Call]
+    P4 --> Raise4[Allow Raise if enough credits]
+    P4 --> AllIn4[Allow All-in if short on credits]
+    P4 --> Fold4[Allow Fold anytime]
+
+    P4 --> Showdown[Showdown: Reveal Hands if 2+ Remain]
+  </pre>
+</body>
+</html>
