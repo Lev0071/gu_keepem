@@ -8,6 +8,8 @@
 #include "config.h"
 #include "gamestate.h"
 #include "handscore.h"
+#include "status.h"
+#include <stdbool.h>
 
 #define MAX_PLAYERS 8 
 #define INITIAL_CREDITS 100 // Can be provided by the user in the next iteration
@@ -387,3 +389,35 @@ void run_prediction_round() {
 
     printf("\nEnd of prediction round. Pot now has %d credits.\n", pot);
 }
+
+bool is_valid_action(Player *p, GameState *g, ActionType action) {
+    if (p->in_game != PLAYING || p->status != ACTIVE || p->credits <= 0) {
+        return false;
+    }
+
+    int call_amount = g->current_bet - p->current_bet;
+
+    switch (action) {
+        case ACTION_CHECK:
+            return call_amount == 0;
+
+        case ACTION_CALL:
+            return call_amount > 0 && p->credits >= call_amount;
+
+        case ACTION_BET:
+            return g->current_bet == 0 && p->credits > 0;
+
+        case ACTION_RAISE:
+            return g->current_bet > 0 && p->credits > call_amount;
+
+        case ACTION_ALL_IN:
+            return p->credits > 0;
+
+        case ACTION_FOLD:
+            return p->status == ACTIVE;
+
+        default:
+            return false;
+    }
+}
+

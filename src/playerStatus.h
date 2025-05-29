@@ -7,4 +7,13 @@ typedef enum playerStatus {
     FOLDED = 2
 } PlayerStatus;   
 
+typedef enum {
+    ACTION_CHECK,
+    ACTION_CALL,
+    ACTION_BET,
+    ACTION_RAISE,
+    ACTION_ALL_IN,
+    ACTION_FOLD
+} ActionType;
+
 #endif // PLAYER_STATUS_H
