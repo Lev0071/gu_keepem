@@ -253,12 +253,24 @@ void test_action_fold() {
 
 // Main
 int main() {
+    printf("START============ TESTING - CHECK ============\n");
     test_action_check();
+    printf("END============ TESTING - CHECK ============\n\n");
+    printf("START============ TESTING - CALL ============\n");
     test_action_call();
+    printf("END============ TESTING - CALL ============\n\n");
+    printf("START============ TESTING - BET ============\n");
     test_action_bet();
+    printf("END============ TESTING - BET ============\n\n");
+    printf("START============ TESTING - RAISE ============\n");
     test_action_raise();
+    printf("END============ TESTING - RAISE ============\n\n");
+    printf("START============ TESTING - ALL_IN ============\n");
     test_action_all_in();
+    printf("END============ TESTING - ALL_IN ============\n\n");
+    printf("START============ TESTING - FOLD ============\n");
     test_action_fold();
+    printf("END============ TESTING - FOLD ============\n\n");
 
     printf("All tests passed.\n");
     return 0;
