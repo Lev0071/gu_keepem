@@ -1,10 +1,10 @@
 #ifndef PLAYER_STATUS_H
 #define PLAYER_STATUS_H
 
-typedef enum playerStatus {
-    OUT = 0,
-    ACTIVE = 1,
-    FOLDED = 2
+typedef enum playerStatus{
+    STATUS_OUT = 0,     // Quit or out of credits
+    STATUS_ACTIVE = 1,  // Currently in the hand
+    STATUS_FOLDED = 2   // Folded during this hand
 } PlayerStatus;   
 
 typedef enum {
