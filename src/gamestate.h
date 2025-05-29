@@ -18,7 +18,7 @@ typedef struct {
     int current_bet;
     int small_blind;
     int big_blind;
-    int last_raise;
+    int last_raise_amount; // Minimum raise required  
 } GameState;
 
 #endif // GAMESTATE_H

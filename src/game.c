@@ -407,8 +407,10 @@ bool is_valid_action(Player *p, GameState *g, ActionType action) {
         case ACTION_BET:
             return g->current_bet == 0 && p->credits > 0;
 
-        case ACTION_RAISE:
-            return g->current_bet > 0 && p->credits > call_amount;
+        case ACTION_RAISE: {
+            int max_possible_raise_amount = p->credits - call_amount;
+            return g->current_bet > 0 && max_possible_raise_amount >= g->last_raise_amount;
+        }
 
         case ACTION_ALL_IN:{
             if (p->credits <= 0) return false;
