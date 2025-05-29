@@ -1,6 +1,8 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
+extern int last_raise_amount;  // size of last raise made this round
+
 typedef enum {
     STAGE_PREFLOP,
     STAGE_FLOP,
