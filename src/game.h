@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include "playerStatus.h"
+#include "player.h"
+#include "gamestate.h"
 
 void setup_game();
 void play_hand();

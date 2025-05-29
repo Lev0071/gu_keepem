@@ -8,7 +8,7 @@
 #include "config.h"
 #include "gamestate.h"
 #include "handscore.h"
-#include "status.h"
+#include "playerStatus.h"
 #include <stdbool.h>
 
 #define MAX_PLAYERS 8 
@@ -391,7 +391,7 @@ void run_prediction_round() {
 }
 
 bool is_valid_action(Player *p, GameState *g, ActionType action) {
-    if (p->in_game != PLAYING || p->status != ACTIVE || p->credits <= 0) {
+    if (p->in_game != PLAYING || p->status != STATUS_ACTIVE || p->credits <= 0) {
         return false;
     }
 
@@ -410,11 +410,26 @@ bool is_valid_action(Player *p, GameState *g, ActionType action) {
         case ACTION_RAISE:
             return g->current_bet > 0 && p->credits > call_amount;
 
-        case ACTION_ALL_IN:
-            return p->credits > 0;
+        case ACTION_ALL_IN:{
+            if (p->credits <= 0) return false;
+
+            if (g->current_bet == 0) {
+                // All-in as a bet
+                return true;
+            } else if (p->credits + p->current_bet > g->current_bet) {
+                // All-in as a raise
+                return true;
+            } else if (p->credits + p->current_bet == g->current_bet) {
+                // All-in as a call
+                return true;
+            } else {
+                // All-in is less than call — still allowed, but not re-raisable
+                return true;
+            }
+        }
 
         case ACTION_FOLD:
-            return p->status == ACTIVE;
+            return p->status == STATUS_ACTIVE;
 
         default:
             return false;
