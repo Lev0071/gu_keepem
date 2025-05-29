@@ -61,6 +61,8 @@
   "files.associations": {
     "assert.h": "c",
     "utils.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "playerstatus.h": "c",
+    "gamestate.h": "c"
   }
 }
