@@ -18,6 +18,7 @@ typedef struct {
     int current_bet;
     int small_blind;
     int big_blind;
+    int last_raise;
 } GameState;
 
 #endif // GAMESTATE_H
