@@ -39,7 +39,7 @@ void test_action_check() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Check ? %s\n",is_valid_action(&anna, &game_state, ACTION_CHECK) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_CHECK) == true);
     
@@ -74,7 +74,7 @@ void test_action_call() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Place a bet ? %s\n",is_valid_action(&anna, &game_state, ACTION_CALL) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_CALL) == true);
 
@@ -110,7 +110,7 @@ void test_action_bet() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Place a bet ? %s\n",is_valid_action(&anna, &game_state, ACTION_BET) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_BET) == true);
 
@@ -121,7 +121,7 @@ void test_action_bet() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Place a bet ? %s\n",is_valid_action(&anna, &game_state, ACTION_BET) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_BET) == false);
     printf("No she can call,raise or fold\n");
@@ -133,7 +133,7 @@ void test_action_bet() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Place a bet ? %s\n",is_valid_action(&anna, &game_state, ACTION_BET) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_BET) == true);
 }
@@ -155,7 +155,7 @@ void test_action_raise() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Call ? %s\n",is_valid_action(&anna, &game_state, ACTION_CALL) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_RAISE) == true);
     printf("Can Anna Raise ? %s\n",is_valid_action(&anna, &game_state, ACTION_RAISE) ? "yes":"no");
@@ -197,7 +197,7 @@ void test_action_all_in() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Go ALL-IN as a bet ? %s\n",is_valid_action(&anna, &game_state, ACTION_ALL_IN) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_ALL_IN) == true);
     // ✅ Case: all-in used to call exactly
@@ -207,7 +207,7 @@ void test_action_all_in() {
     printf("her current bet: %i\n",anna.current_bet);
     printf("latest bet in hand: %i\n",game_state.current_bet);
     printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
-    printf("in the hand: %s\n",anna.in_game == STATUS_ACTIVE ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
     printf("Can Anna Go ALL-IN as a call ? %s\n",is_valid_action(&anna, &game_state, ACTION_ALL_IN) ? "yes":"no");
     assert(is_valid_action(&anna, &game_state, ACTION_ALL_IN) == true);
     // ⚠️ Case: all-in < call (can’t raise, but still allowed)
@@ -216,13 +216,44 @@ void test_action_all_in() {
 // ACTION_FOLD
 void test_action_fold() {
     // ✅ Case: Player is active
+        Player anna = {
+        .credits = 500,
+        .current_bet = 0,
+        .in_game = PLAYING,
+        .status = STATUS_ACTIVE
+    };
+    GameState game_state = {
+        .current_bet = 0
+    };
+    printf("Player: Anna\n");
+    printf("credits: %i\n",anna.credits);
+    printf("her current bet: %i\n",anna.current_bet);
+    printf("latest bet in hand: %i\n",game_state.current_bet);
+    printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
+    printf("Can FOLD ? %s\n",is_valid_action(&anna, &game_state, ACTION_FOLD) ? "yes":"no");
+    assert(is_valid_action(&anna, &game_state, ACTION_FOLD) == true);
     // ❌ Case: Player already folded or out
+    anna.status = STATUS_OUT;
+    printf("Player: Anna\n");
+    printf("credits: %i\n",anna.credits);
+    printf("her current bet: %i\n",anna.current_bet);
+    printf("latest bet in hand: %i\n",game_state.current_bet);
+    printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
+    printf("Can Anna FOLD ? %s\n",is_valid_action(&anna, &game_state, ACTION_FOLD) ? "yes":"no");
+    assert(is_valid_action(&anna, &game_state, ACTION_FOLD) == false);
+    printf("NOW:\n");
+    anna.status = STATUS_FOLDED;
+    printf("in the game: %s\n",anna.in_game == PLAYING ? "yes":"no");
+    printf("in the hand: %s\n",anna.status == STATUS_ACTIVE ? "yes":"no");
+    printf("Can Anna FOLD ? %s\n",is_valid_action(&anna, &game_state, ACTION_FOLD) ? "yes":"no");
+    assert(is_valid_action(&anna, &game_state, ACTION_FOLD) == false);
 }
 
 // Main
 int main() {
     test_action_check();
-    printf("All CHECK tests passed.\n");
     test_action_call();
     test_action_bet();
     test_action_raise();
