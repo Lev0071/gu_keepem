@@ -26,26 +26,51 @@ void print_pot(const Pot *pot){
 }
 
 void build_side_pots(Pot pots[], int *pot_count, Player players[], int num_players){
+    /*
+    Simulates layered pot creation using players' current bets
+    Supports side pots in all-in situations
+    Builds pots fairly by peeling off contributions in smallest slices
+    Tracks who is eligible to win each pot
+    */
     int contributions[MAX_PLAYERS];
     for(int i=0;i<num_players;i++){
         contributions[i] = players[i].current_bet;
-    }
+    }                                                                                           // Copy player bets into local array
 
     int remaining_players = num_players;
-    *pot_count = 0;
+    *pot_count = 0;                                                                             //Initialize loop conditions
 
-    while(remaining_players > 0){
-        int main_contribution = INT_MAX;
+    while(remaining_players > 0){                                                               //Main pot-building loop
+        int min_contribution = INT_MAX;
 
-        // Fin smallest non zero contribution
+        // Find smallest non zero contribution
         for (int i = 0; i < num_players; i++) {
-            if(contributions[i]>0 && contributions [i] < main_contribution){
-                main_contribution = contributions[i];
+            if(contributions[i]>0 && contributions [i] < min_contribution){
+                min_contribution = contributions[i];
+            }
+        }                                                                                      //Find the minimum non-zero contribution
+
+        if(min_contribution == INT_MAX) break;                                                // Break if no more contributions exist
+
+        Pot *pot = &pots[(*pot_count)];                                                        //Create a new pot
+        init_pot(pot);
+
+        for(int i=0;i<num_players;i++){
+            if(contributions[i]>0){
+                pot->amount += min_contribution;
+                add_eligible_player(pot,&players[i]);
+                contributions[i] -= min_contribution;
+            }
+        }                                                                                       // Collect min_contribution from each contributing player
+
+        (*pot_count)++;                                                                         //Move to the next pot
+
+        // Update remianing players
+        remaining_players=0;                                                                    //Repeat if more contributions exist
+        for(int i = 0; i < num_players;i++){
+            if(contributions[i] > 0){
+                remaining_players++;
             }
         }
-        if(main_contribution == INT_MAX) break;
-
-        Pot *pot = &pots[(*pot_count)];
-        init_pot(pot);
     }
 }
