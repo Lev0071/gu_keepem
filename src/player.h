@@ -5,10 +5,11 @@
 #include "playerStatus.h"
 #include "inGame.h"
 #include "handscore.h"
+#include "constants.h"
 
 
 typedef struct player {
-    char name[50];
+    char name[MAX_NAME_LENGTH];
     int credits;
     InGame in_game;       // replaces int: 1 = playing, 0 = quit
     int current_bet;

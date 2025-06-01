@@ -1,5 +1,7 @@
 #include "pot.h"
 #include <stdio.h>
+#include <limits.h> // for INT_MAX
+#include "constants.h"
 
 void init_pot(Pot *pot){
     pot->amount = 0;
@@ -21,4 +23,29 @@ void print_pot(const Pot *pot){
         printf("%s ",pot->eligible_players[i]->name);
     }
     printf("\n");
+}
+
+void build_side_pots(Pot pots[], int *pot_count, Player players[], int num_players){
+    int contributions[MAX_PLAYERS];
+    for(int i=0;i<num_players;i++){
+        contributions[i] = players[i].current_bet;
+    }
+
+    int remaining_players = num_players;
+    *pot_count = 0;
+
+    while(remaining_players > 0){
+        int main_contribution = INT_MAX;
+
+        // Fin smallest non zero contribution
+        for (int i = 0; i < num_players; i++) {
+            if(contributions[i]>0 && contributions [i] < main_contribution){
+                main_contribution = contributions[i];
+            }
+        }
+        if(main_contribution == INT_MAX) break;
+
+        Pot *pot = &pots[(*pot_count)];
+        init_pot(pot);
+    }
 }
