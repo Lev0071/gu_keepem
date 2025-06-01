@@ -39,15 +39,15 @@ void build_side_pots(Pot pots[], int *pot_count, Player players[], int num_playe
     *pot_count = 0;
 
     while(remaining_players > 0){
-        int main_contribution = INT_MAX;
+        int min_contribution = INT_MAX;
 
         // Fin smallest non zero contribution
         for (int i = 0; i < num_players; i++) {
-            if(contributions[i]>0 && contributions [i] < main_contribution){
-                main_contribution = contributions[i];
+            if(contributions[i]>0 && contributions [i] < min_contribution){
+                min_contribution = contributions[i];
             }
         }
-        if(main_contribution == INT_MAX) break;
+        if(min_contribution == INT_MAX) break;
 
         Pot *pot = &pots[(*pot_count)];
         init_pot(pot);
