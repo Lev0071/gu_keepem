@@ -15,8 +15,8 @@
 #define NUM_RANKS 13
 
 // Game stages
-typedef enum {
-    STAGE_PREFLOP,
+typedef enum roundStage{
+    STAGE_PREFLOP = 1,
     STAGE_FLOP,
     STAGE_TURN,
     STAGE_RIVER,

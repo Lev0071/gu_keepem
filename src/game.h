@@ -6,6 +6,9 @@
 #include "player.h"
 #include "gamestate.h"
 
+extern Player players[MAX_PLAYERS];
+extern int player_count;
+
 typedef struct {
     Player *player;
     HandScore score;

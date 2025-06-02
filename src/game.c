@@ -22,9 +22,21 @@ static Card table[5];       // 5 cards: flop (3), turn (1), river (1)
 static int deck_size = 0;   // number of cards remaining
 static int big_blind = 0;   
 static int small_blind = 0;   
-static Player players[MAX_PLAYERS];  // players array private to the file (game.c)
-static int player_count = 0;
+Player players[MAX_PLAYERS];
+int player_count = 0;
 static int dealer_index = 0;
+static GameState g;
+
+const char* stage_to_string(RoundStage stage) {
+    switch (stage) {
+        case STAGE_PREFLOP: return "Pre-Flop";
+        case STAGE_FLOP: return "Flop";
+        case STAGE_TURN: return "Turn";
+        case STAGE_RIVER: return "River";
+        case STAGE_SHOWDOWN: return "Showdown";
+        default: return "Unknown";
+    }
+}
 
 void setup_game(){      // Ask number of players,names,assign credits
     srand(time(NULL)); //Seed randon generator, make it truly random each time program is executed (based on time)
@@ -75,6 +87,8 @@ void setup_game(){      // Ask number of players,names,assign credits
     printf("==================================\n");
     #endif
     
+    g.big_blind = big_blind;
+    g.small_blind = small_blind;
 }
 
 void print_table_cards(int count) {
@@ -202,98 +216,42 @@ void remove_quitters(){
 }
 
 void play_hand() { 
-    printf("\n--- Starting a new hand ---\n");
-    printf("%s is the dealer",players[dealer_index].name);
+    printf("\n🎲 --- Starting a new hand ---\n");
+    printf("🃏 Dealer: %s\n", players[dealer_index].name);
     wait_for_enter("\nPress Enter to begin...\n");
 
-    // Step 1: Reset pot
-    int pot = 0;
+    // Step 1: Reset player statuses and bets
+    for (int i = 0; i < player_count; i++) {
+        players[i].current_bet = 0;
+        players[i].status = STATUS_ACTIVE;
+    }
 
-    // Step 2: Deal cards
+    // Step 2: Post small and big blind (e.g., 10 and 20)
+    int sb_index = (dealer_index + 1) % player_count;
+    int bb_index = (dealer_index + 2) % player_count;
+    post_blinds(sb_index, bb_index, &g);
+
+
+    // Step 3: Deal hole cards to each active player
     deal_hole_cards();
+
+    // Step 4: Deal all 5 community cards (flop, turn, river)
     deal_community_cards();
 
-    // Step 3: Show players' hole cards
-    printf("\n🃏 Cards dealt to all players...\n");
-    wait_for_enter("\nPress Enter to begin...\n");
-    for (int i = 0; i < player_count; i++) {
-        if (!players[i].in_game || players[i].credits <= 0) continue; // This line runs ONLY if the player is in the game AND has credits > 0
-        printf("%s's hand: ", players[i].name);
-        print_card(players[i].hand[0]);
-        printf(" ");
-        print_card(players[i].hand[1]);
-        printf("\n");
-    }
+    
+    // Step 5: Run prediction & betting rounds (to be implemented)
+    run_prediction_round(STAGE_PREFLOP, &g);
+    run_prediction_round(STAGE_FLOP, &g);
+    run_prediction_round(STAGE_TURN, &g);
+    run_prediction_round(STAGE_RIVER, &g);
 
-    // Step 4: Flop
-    printf("\n Dealing the flop...\n");
-    print_table_cards(3); // First 3 cards
-    // Here you will later insert: run_prediction_round();
+    // Step 6: Resolve showdown
+    resolve_betting_round(players, player_count, table);
 
-    // Step 5: Turn
-    printf("\n Dealing the turn...\n");
-    print_table_cards(4); // First 4 cards (flop + turn)
-    // Here you will later insert: run_prediction_round();
-
-    // Step 6: River
-    printf("\n Dealing the river...\n");
-    print_table_cards(5); // All 5 cards
-    // Here you will later insert: run_prediction_round();
-
-    // Step 7: FOR NOW - pick random winner
-    int winner = -1;
-    do {
-        winner = rand() % player_count;
-    } while (!players[winner].in_game || players[winner].credits <= 0);
-
-    // Step 8: Deduct random credits (FAKE until betting is built)
-    for (int i = 0; i < player_count; i++) {
-        if (i == winner || !players[i].in_game || players[i].credits <= 0) continue;
-
-        int deduction = rand() % 11 + 5; // 5–15 credits
-        if (players[i].credits < deduction) deduction = players[i].credits;
-
-        players[i].credits -= deduction;
-        pot += deduction;
-    }
-
-    // Step 9: Award pot to winner
-    players[winner].credits += pot;
-
-    printf("🏆 %s wins this round and collects %d credits!\n", players[winner].name, pot);
-
-    // Step 10: Show player credits
-    printf("\n💰 Player Credits:\n");
-    printf("\n$$$$$$$$$$$$$$$$$$\n");
-    for (int i = 0; i < player_count; i++) {
-        printf("%s: %d credits\n", players[i].name, players[i].credits);
-    }
-    printf("$$$$$$$$$$$$$$$$$$\n");
-
-    dealer_index = (dealer_index +1)%player_count;
-
-    printf("Table cards at the end:\n");
-    for(int i=0;i<5;i++){
-        print_card(table[i]);
-    }printf("\n");
-    for (int i = 0; i < player_count; i++) {
-        if (!players[i].in_game || players[i].credits <= 0) continue; // This line runs ONLY if the player is in the game AND has credits > 0
-        printf("%s's hand: ", players[i].name);
-        print_card(players[i].hand[0]);
-        printf(" ");
-        print_card(players[i].hand[1]);
-        printf("\n");
-    }
-    printf("Evaluate each players best hand\n");
-    for(int i=0;i<player_count;i++){
-        printf("Player %s had the best hand: ",players[i].name);
-        HandScore score = evaluate_best_hand(players[i].hand,table);
-        for (int j = 0; j < 5; j++) {
-            print_card(score.best_hand[j]);
-        }
-        printf("\n");
-    }
+    // Step 7: Rotate dealer
+    dealer_index = (dealer_index + 1) % player_count;
 }
+
 
 
 
@@ -315,81 +273,103 @@ void show_final_message(){     // Print game over message
     printf("\nAll players have quit or lost. No winner this time!\n");
 }
 
-void run_prediction_round() {
-    int current_bet = 0;
-    int pot = 0;
+void run_prediction_round(RoundStage stage, GameState *g) {
+    g->stage = stage;
+    printf("\n🔔 Starting %s round!\n", stage_name(stage));
 
-    printf("\n🔔 Starting a prediction round!\n");
-
-    // Step 1: Small Guess
-    int small_index = 0; // First player
-    if (players[small_index].in_game && players[small_index].credits > 0) {
-        int amount = SMALL_GUESS;
-        if (players[small_index].credits < amount) amount = players[small_index].credits;
-        players[small_index].credits -= amount;
-        players[small_index].current_bet = amount;
-        pot += amount;
-        printf("%s posts Small Guess (%d credits)\n", players[small_index].name, amount);
-        current_bet = amount;
-    }
-
-    // Step 2: Big Guess
-    int big_index = 1 % player_count; // Second player
-    if (players[big_index].in_game && players[big_index].credits > 0) {
-        int amount = BIG_GUESS;
-        if (players[big_index].credits < amount) amount = players[big_index].credits;
-        players[big_index].credits -= amount;
-        players[big_index].current_bet = amount;
-        pot += amount;
-        printf("%s posts Big Guess (%d credits)\n", players[big_index].name, amount);
-        if (amount > current_bet) current_bet = amount;
-    }
-
-    // Step 3: Betting Round
+    int active_players = 0;
     for (int i = 0; i < player_count; i++) {
-        if (!players[i].in_game || players[i].credits <= 0) continue;
-
-        // Skip players who already posted guesses
-        if (i == small_index || i == big_index) continue;
-
-        printf("\n%s's turn (Credits: %d)\n", players[i].name, players[i].credits);
-        printf("1. Predict (bet new)  2. Call (match %d)  3. Raise  4. Fold\n", current_bet);
-        int choice = get_integer_input("Enter choice: ");
-
-        if (choice == 1) { // Predict (new bet)
-            int bet = get_integer_input("Enter your bet amount: ");
-            if (bet > players[i].credits) bet = players[i].credits;
-            players[i].credits -= bet;
-            players[i].current_bet = bet;
-            pot += bet;
-            if (bet > current_bet) current_bet = bet;
-        } 
-        else if (choice == 2) { // Call (match current bet)
-            int diff = current_bet - players[i].current_bet;
-            if (diff > players[i].credits) diff = players[i].credits;
-            players[i].credits -= diff;
-            players[i].current_bet += diff;
-            pot += diff;
-        }
-        else if (choice == 3) { // Raise
-            int raise = get_integer_input("Enter raise amount: ");
-            if (raise > players[i].credits) raise = players[i].credits;
-            int total = current_bet + raise;
-            int diff = total - players[i].current_bet;
-            if (diff > players[i].credits) diff = players[i].credits;
-            players[i].credits -= diff;
-            players[i].current_bet += diff;
-            pot += diff;
-            current_bet = players[i].current_bet;
-        }
-        else if (choice == 4) { // Fold
-            players[i].status = 2; // Folded
-            printf("%s folds!\n", players[i].name);
-        }
+        if (players[i].status == STATUS_ACTIVE || players[i].status == STATUS_ALL_IN)
+            active_players++;
     }
 
-    printf("\nEnd of prediction round. Pot now has %d credits.\n", pot);
+    if (active_players <= 1) {
+        printf("Only one player remaining. Skipping betting.\n");
+        return;
+    }
+
+    // Reset per-round variables
+    g->current_bet = 0;
+    g->last_raise_amount = g->big_blind;
+
+    int starting_index = (dealer_index + 1) % player_count;
+
+    int consecutive_calls = 0;
+    int last_to_raise = -1;
+    int current_turn = starting_index;
+
+    while (consecutive_calls < active_players) {
+        Player *p = &players[current_turn];
+
+        if (p->in_game != PLAYING || p->status != STATUS_ACTIVE || p->credits == 0) {
+            current_turn = (current_turn + 1) % player_count;
+            continue;
+        }
+
+        int call_amount = g->current_bet - p->current_bet;
+        //printf("\n%s's turn (Credits: %d)\n", p->name, p->credits);
+        print_table_state(g, players, current_turn);
+        printf("Current bet: %d | Your bet: %d | Call = %d\n", g->current_bet, p->current_bet, call_amount);
+        printf("1. Call | 2. Raise | 3. All-In | 4. Fold\n");
+
+        int choice = get_integer_input("Enter your action: ");
+        if (choice == 1 && is_valid_action(p, g, ACTION_CALL)) {
+            int amount = (call_amount > p->credits) ? p->credits : call_amount;
+            p->credits -= amount;
+            p->current_bet += amount;
+            g->pot += amount;
+            printf("%s calls %d.\n", p->name, amount);
+            consecutive_calls++;
+        }
+        else if (choice == 2 && is_valid_action(p, g, ACTION_RAISE)) {
+            int raise_amount = get_integer_input("Enter raise amount: ");
+            if (raise_amount < g->last_raise_amount) raise_amount = g->last_raise_amount;
+            int total_bet = g->current_bet + raise_amount;
+            int diff = total_bet - p->current_bet;
+            if (diff > p->credits) diff = p->credits;
+
+            p->credits -= diff;
+            p->current_bet += diff;
+            g->pot += diff;
+
+            g->last_raise_amount = raise_amount;
+            g->current_bet = p->current_bet;
+            last_to_raise = current_turn;
+            consecutive_calls = 1;
+            printf("%s raises by %d.\n", p->name, raise_amount);
+        }
+        else if (choice == 3 && is_valid_action(p, g, ACTION_ALL_IN)) {
+            int amount = p->credits;
+            p->current_bet += amount;
+            g->pot += amount;
+            p->credits = 0;
+            p->status = STATUS_ALL_IN;
+            printf("%s goes all-in with %d.\n", p->name, amount);
+            if (p->current_bet > g->current_bet) {
+                g->last_raise_amount = p->current_bet - g->current_bet;
+                g->current_bet = p->current_bet;
+                last_to_raise = current_turn;
+                consecutive_calls = 1;
+            } else {
+                consecutive_calls++;
+            }
+        }
+        else if (choice == 4 && is_valid_action(p, g, ACTION_FOLD)) {
+            p->status = STATUS_FOLDED;
+            printf("%s folds.\n", p->name);
+            active_players--;
+        } else {
+            printf("Invalid choice or action not allowed.\n");
+            continue;
+        }
+
+        if (active_players <= 1) break;
+        current_turn = (current_turn + 1) % player_count;
+    }
+
+    printf("✅ Betting round complete. Pot: %d\n", g->pot);
 }
+
 
 bool is_valid_action(Player *p, GameState *g, ActionType action) {
     if (p->in_game != PLAYING || p->status != STATUS_ACTIVE || p->credits <= 0) {
@@ -539,6 +519,54 @@ void resolve_pots_by_rank(Pot pots[], int pot_count, RankedPlayer ranked[], int 
     }
 }
 
+void print_player_line(Player *p, int is_current) {
+    const char *status_str;
+    switch (p->status) {
+        case STATUS_ACTIVE: status_str = "Active"; break;
+        case STATUS_FOLDED: status_str = "Folded"; break;
+        case STATUS_ALL_IN: status_str = "All-In"; break;
+        default: status_str = "Unknown"; break;
+    }
+
+    printf("%s%-10s | 💰 %3d | Bet %3d | %s | ",
+           is_current ? "👉 " : "   ",
+           p->name,
+           p->credits,
+           p->current_bet,
+           status_str
+    );
+
+    if (p->status == STATUS_FOLDED) {
+        printf("[Folded]\n");
+    } else {
+        print_card(p->hand[0]);
+        printf(" ");
+        print_card(p->hand[1]);
+        printf("\n");
+    }
+}
+
+void print_table_state(GameState *g, Player players[], int current_index) {
+    printf("\n========= TABLE STATE: %s =========\n", stage_to_string(g->stage));
+    for (int i = 0; i < player_count; i++) {
+        print_player_line(&players[i], i == current_index);
+    }
+    printf("Community Cards: ");
+    int cards_to_show = 0;
+    if (g->stage == STAGE_FLOP) cards_to_show = 3;
+    else if (g->stage == STAGE_TURN) cards_to_show = 4;
+    else if (g->stage == STAGE_RIVER || g->stage == STAGE_SHOWDOWN) cards_to_show = 5;
+
+    for (int i = 0; i < cards_to_show; i++) {
+        print_card(table[i]);
+        printf(" ");
+    }
+    printf("\nPot: %d\n", g->pot);
+    printf("=======================================\n");
+}
+
+
+
 void resolve_betting_round(Player players[], int num_players, Card table[5]) {
     Pot pots[MAX_POTS];
     int pot_count = 0;
@@ -557,4 +585,42 @@ void resolve_betting_round(Player players[], int num_players, Card table[5]) {
     for (int i = 0; i < num_players; i++) {
         players[i].current_bet = 0;
     }
+}
+
+void post_blinds(int sb_index, int bb_index, GameState *g) {
+    if (!players[sb_index].in_game || players[sb_index].credits <= 0) return;
+    if (!players[bb_index].in_game || players[bb_index].credits <= 0) return;
+
+    int sb_amount = (players[sb_index].credits >= g->small_blind) ? g->small_blind : players[sb_index].credits;
+    players[sb_index].credits -= sb_amount;
+    players[sb_index].current_bet += sb_amount;
+
+    int bb_amount = (players[bb_index].credits >= g->big_blind) ? g->big_blind : players[bb_index].credits;
+    players[bb_index].credits -= bb_amount;
+    players[bb_index].current_bet += bb_amount;
+
+    g->current_bet = bb_amount;
+    g->last_raise_amount = g->big_blind;
+
+    printf("💰 Small blind posted by %s (%d credits)\n", players[sb_index].name, sb_amount);
+    printf("💰 Big blind posted by %s (%d credits)\n", players[bb_index].name, bb_amount);
+}
+
+void print_table_state(GameState *g, Player players[], int current_index) {
+    printf("\n========= TABLE STATE: %s =========\n", stage_to_string(g->stage));
+    for (int i = 0; i < player_count; i++) {
+        print_player_line(&players[i], i == current_index);
+    }
+    printf("Community Cards: ");
+    int cards_to_show = 0;
+    if (g->stage == STAGE_FLOP) cards_to_show = 3;
+    else if (g->stage == STAGE_TURN) cards_to_show = 4;
+    else if (g->stage == STAGE_RIVER || g->stage == STAGE_SHOWDOWN) cards_to_show = 5;
+
+    for (int i = 0; i < cards_to_show; i++) {
+        print_card(table[i]);
+        printf(" ");
+    }
+    printf("\nPot: %d\n", g->pot);
+    printf("=======================================\n");
 }
