@@ -2,6 +2,8 @@
 #include "../src/player.h"
 #include "../src/gamestate.h"
 #include "../src/utils.h"
+#include "../src/pot.h"
+#include "../src/handscore.h"
 #include <stdio.h>
 
 int main() {
@@ -27,3 +29,5 @@ int main() {
     print_table_state(&g, test_players, 2);
     return 0;
 }
+
+// gcc -o test_print_table_state_2 test_print_table_state_2.c ../src/game.c ../src/player.c ../src/card.c ../src/utils.c -Isrc

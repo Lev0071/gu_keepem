@@ -118,3 +118,6 @@ int main() {
     print_table_state(&g, players, 2);
     return 0;
 }
+
+
+// gcc -o test_print_table_state test_print_table_state.c

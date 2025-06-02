@@ -275,7 +275,7 @@ void show_final_message(){     // Print game over message
 
 void run_prediction_round(RoundStage stage, GameState *g) {
     g->stage = stage;
-    printf("\n🔔 Starting %s round!\n", stage_name(stage));
+    printf("\n🔔 Starting %s round!\n", stage_to_string(stage));
 
     int active_players = 0;
     for (int i = 0; i < player_count; i++) {
@@ -545,27 +545,6 @@ void print_player_line(Player *p, int is_current) {
         printf("\n");
     }
 }
-
-void print_table_state(GameState *g, Player players[], int current_index) {
-    printf("\n========= TABLE STATE: %s =========\n", stage_to_string(g->stage));
-    for (int i = 0; i < player_count; i++) {
-        print_player_line(&players[i], i == current_index);
-    }
-    printf("Community Cards: ");
-    int cards_to_show = 0;
-    if (g->stage == STAGE_FLOP) cards_to_show = 3;
-    else if (g->stage == STAGE_TURN) cards_to_show = 4;
-    else if (g->stage == STAGE_RIVER || g->stage == STAGE_SHOWDOWN) cards_to_show = 5;
-
-    for (int i = 0; i < cards_to_show; i++) {
-        print_card(table[i]);
-        printf(" ");
-    }
-    printf("\nPot: %d\n", g->pot);
-    printf("=======================================\n");
-}
-
-
 
 void resolve_betting_round(Player players[], int num_players, Card table[5]) {
     Pot pots[MAX_POTS];
