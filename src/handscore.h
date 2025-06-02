@@ -2,6 +2,7 @@
 #ifndef HAND_SCORE_H
 #define HAND_SCORE_H
 #include "card.h"
+#include "constants.h"
 
 // Hand rank constants — higher number = stronger hand
 #define HAND_HIGH_CARD         0   // No combination, just high card
@@ -45,7 +46,6 @@ typedef struct handscore {
     */
     Card best_hand[5];  // The winning hand
 } HandScore;
-
 
 HandScore evaluate_5_card_hand(Card cards[5]);
 HandScore evaluate_best_hand(Card hole[2], Card table[5]);

@@ -4,7 +4,8 @@
 typedef enum playerStatus{
     STATUS_OUT = 0,     // Quit or out of credits
     STATUS_ACTIVE = 1,  // Currently in the hand
-    STATUS_FOLDED = 2   // Folded during this hand
+    STATUS_FOLDED = 2,   // Folded during this hand
+    STATUS_ALL_IN = 3   // All-in and waiting for showdown
 } PlayerStatus;   
 
 typedef enum {

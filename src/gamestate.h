@@ -3,13 +3,13 @@
 
 extern int last_raise_amount;  // size of last raise made this round
 
-typedef enum {
-    STAGE_PREFLOP,
-    STAGE_FLOP,
-    STAGE_TURN,
-    STAGE_RIVER,
-    STAGE_SHOWDOWN
-} RoundStage;
+// typedef enum {
+//     STAGE_PREFLOP,
+//     STAGE_FLOP,
+//     STAGE_TURN,
+//     STAGE_RIVER,
+//     STAGE_SHOWDOWN
+// } RoundStage;
 
 typedef struct {
     RoundStage stage;
