@@ -17,4 +17,4 @@ int main() {
 
 // gcc -o gu_keepem main.c game.c player.c utils.c card.c handscore.c
 // gcc -o gu_keepem src/main.c src/game.c src/player.c src/utils.c src/card.c src/handscore.c src/pot.c -Isrc -Wall -Wextra
-
+// gcc -o gu_keepem main.c game.c player.c src/utils.c card.c handscore.c pot.c -Isrc -Wall -Wextra

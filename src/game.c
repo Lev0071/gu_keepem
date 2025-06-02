@@ -9,6 +9,7 @@
 #include "gamestate.h"
 #include "handscore.h"
 #include "playerStatus.h"
+#include "pot.h"
 #include <stdbool.h>
 
 #define MAX_PLAYERS 8 
@@ -24,11 +25,6 @@ static int small_blind = 0;
 static Player players[MAX_PLAYERS];  // players array private to the file (game.c)
 static int player_count = 0;
 static int dealer_index = 0;
-
-typedef struct {
-    Player *player;
-    HandScore score;
-} RankedPlayer;
 
 void setup_game(){      // Ask number of players,names,assign credits
     srand(time(NULL)); //Seed randon generator, make it truly random each time program is executed (based on time)
@@ -488,6 +484,7 @@ int rank_active_players(Player players[], int num_players, Card table[5], Ranked
  * as long as the sign is consistent and meaningful.
  */
 
+
 // Distributes chips from each pot to the top-ranked eligible players.
 // It checks each pot, finds the winners, and splits the pot accordingly.
 void resolve_pots_by_rank(Pot pots[], int pot_count, RankedPlayer ranked[], int ranked_count) {
@@ -539,5 +536,25 @@ void resolve_pots_by_rank(Pot pots[], int pot_count, RankedPlayer ranked[], int 
                    share,
                    (p == 0) ? "main" : "side");
         }
+    }
+}
+
+void resolve_betting_round(Player players[], int num_players, Card table[5]) {
+    Pot pots[MAX_POTS];
+    int pot_count = 0;
+
+    // Build main + side pots
+    build_side_pots(pots, &pot_count, players, num_players);
+
+    // Rank players based on hand
+    RankedPlayer ranked[MAX_PLAYERS];
+    int ranked_count = rank_active_players(players, num_players, table, ranked);
+
+    // Distribute pot(s)
+    resolve_pots_by_rank(pots, pot_count, ranked, ranked_count);
+
+    // Reset player bets for next round
+    for (int i = 0; i < num_players; i++) {
+        players[i].current_bet = 0;
     }
 }
