@@ -25,6 +25,11 @@ static Player players[MAX_PLAYERS];  // players array private to the file (game.
 static int player_count = 0;
 static int dealer_index = 0;
 
+typedef struct {
+    Player *player;
+    HandScore score;
+} RankedPlayer;
+
 void setup_game(){      // Ask number of players,names,assign credits
     srand(time(NULL)); //Seed randon generator, make it truly random each time program is executed (based on time)
 
@@ -438,3 +443,101 @@ bool is_valid_action(Player *p, GameState *g, ActionType action) {
     }
 }
 
+int rank_active_players(Player players[], int num_players, Card table[5], RankedPlayer ranked[]) {
+    int count = 0;
+    for (int i = 0; i < num_players; i++) {
+        if (players[i].status == STATUS_ACTIVE || players[i].status == STATUS_ALL_IN) {
+            ranked[count].player = &players[i];
+            ranked[count].score = evaluate_best_hand(players[i].hand, table);
+            count++;
+        }
+    }
+
+    int cmp(const void *a, const void *b) { // see cmp tech-talk
+        RankedPlayer *ra = (RankedPlayer *)a;
+        RankedPlayer *rb = (RankedPlayer *)b;
+        return -compare_hand_scores(ra->score, rb->score); // descending
+    }
+
+    qsort(ranked, count, sizeof(RankedPlayer), cmp);
+    return count;
+}
+
+// cmp tech-talk
+/*
+ * This comparison approach is used because we're not comparing simple integers,
+ * but rather complex hand score structures (HandScore), which may contain multiple
+ * fields like rank, high card, kickers, etc. C does not allow direct comparison
+ * of structs using operators like > or <, so we rely on a custom comparison function:
+ *
+ *     int compare_hand_scores(HandScore a, HandScore b);
+ *
+ * This function returns:
+ *     > 0  → a is better than b
+ *     == 0 → a and b are equal
+ *     < 0  → b is better than a
+ *
+ * In the local cmp() function used for qsort, we negate the result:
+ *
+ *     return -compare_hand_scores(...);
+ *
+ * This reverses the order, so stronger hands appear first (descending order).
+ *
+ * qsort only cares about the sign of the return value, not the exact number.
+ * So whether compare_hand_scores() returns -1/0/+1 or -42/0/+999 doesn't matter,
+ * as long as the sign is consistent and meaningful.
+ */
+
+// Distributes chips from each pot to the top-ranked eligible players.
+// It checks each pot, finds the winners, and splits the pot accordingly.
+void resolve_pots_by_rank(Pot pots[], int pot_count, RankedPlayer ranked[], int ranked_count) {
+    for (int p = 0; p < pot_count; p++) {
+        Pot *pot = &pots[p];
+        Player *winners[MAX_ELIGIBLE];  // Array to hold winners of this pot
+        int winner_count = 0;
+
+        // Iterate through players sorted by hand strength
+        for (int i = 0; i < ranked_count; i++) {
+            Player *candidate = ranked[i].player;
+
+            // Check if candidate is eligible for this pot
+            int eligible = 0;
+            for (int j = 0; j < pot->num_players; j++) {
+                if (pot->eligible_players[j] == candidate) {
+                    eligible = 1;
+                    break;
+                }
+            }
+
+            // Skip players not eligible for this pot
+            if (!eligible) continue;
+
+            if (winner_count == 0) {
+                // First eligible winner found
+                winners[winner_count++] = candidate;
+            } else {
+                // Compare with the current top player's score
+                HandScore top = ranked[0].score;
+                if (compare_hand_scores(ranked[i].score, top) == 0) {
+                    // Tie — add to winner list
+                    winners[winner_count++] = candidate;
+                } else {
+                    // Lower score — stop looking, only top ties get the pot
+                    break;
+                }
+            }
+        }
+
+        // Divide pot amount equally among winners
+        int share = pot->amount / winner_count;
+        for (int i = 0; i < winner_count; i++) {
+            winners[i]->credits += share;
+
+            // Output the result for this winner
+            printf("🏆 %s wins %d from %s pot\n",
+                   winners[i]->name,
+                   share,
+                   (p == 0) ? "main" : "side");
+        }
+    }
+}
