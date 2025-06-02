@@ -7,15 +7,16 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include "constants.h"
 
 #define MAX_PLAYERS 8
 
 // Fisher–Yates Shuffle
-void shuffle(char array[][50], int size) { // shuffles an array
+void shuffle(char array[][MAX_NAME_LENGTH], int size) { // shuffles an array
     for (int i = size - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         // Swap
-        char temp[50];
+        char temp[MAX_NAME_LENGTH];
         strcpy(temp, array[i]);
         strcpy(array[i], array[j]);// array[i] = array[j];
         strcpy(array[j], temp);// array[j] = temp;
@@ -25,7 +26,7 @@ void shuffle(char array[][50], int size) { // shuffles an array
 int main() {
     srand(time(NULL));  // Seed RNG
     int player_count;
-    char names[MAX_PLAYERS][50]; // row the player object, column the player's name || 2D Array
+    char names[MAX_PLAYERS][MAX_NAME_LENGTH]; // row the player object, column the player's name || 2D Array
     Card hole[MAX_PLAYERS][2]; // row of players and their cards as card objects || 2D Array
     Card table[5];
     Card deck[52];
@@ -54,7 +55,7 @@ int main() {
         return 1;
     }
     }else if(decide == 'a' || decide == 'A'){
-        char playerNames[8][50] = {
+        char playerNames[8][MAX_NAME_LENGTH] = {
         "Yasin",
         "Andrea",
         "Adrian",
