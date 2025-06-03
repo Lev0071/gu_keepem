@@ -419,6 +419,12 @@ bool is_valid_action(Player *p, GameState *g, ActionType action) {
     }
 }
 
+int cmp(const void *a, const void *b) { // see cmp tech-talk
+    RankedPlayer *ra = (RankedPlayer *)a;
+    RankedPlayer *rb = (RankedPlayer *)b;
+    return -compare_hand_scores(ra->score, rb->score); // descending
+}
+
 int rank_active_players(Player players[], int num_players, Card table[5], RankedPlayer ranked[]) {
     int count = 0;
     for (int i = 0; i < num_players; i++) {
@@ -429,11 +435,7 @@ int rank_active_players(Player players[], int num_players, Card table[5], Ranked
         }
     }
 
-    int cmp(const void *a, const void *b) { // see cmp tech-talk
-        RankedPlayer *ra = (RankedPlayer *)a;
-        RankedPlayer *rb = (RankedPlayer *)b;
-        return -compare_hand_scores(ra->score, rb->score); // descending
-    }
+
 
     qsort(ranked, count, sizeof(RankedPlayer), cmp);
     return count;
