@@ -39,8 +39,9 @@ void resolve_pots_by_rank(Pot pots[], int pot_count, RankedPlayer ranked[], int 
 
 // Display Helpers
 void print_table_cards(int count); 
-void print_player_line(Player *p, int is_current);
+void print_player_line(Player *p, int is_current, int is_dealer);
 void print_table_state(GameState *g, Player players[], int current_index);
+void print_valid_actions(Player *p, GameState *g, int call_amount);
 
 // Utilities
 const char* stage_to_string(RoundStage stage);

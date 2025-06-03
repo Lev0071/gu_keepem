@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>  // for tolower()
 
 int get_integer_input(const char *prompt){
     int value;
@@ -40,3 +41,17 @@ void wait_for_enter(const char *message) {
     printf("%s", message);
     getchar();
 }
+
+char get_char_input(const char *prompt) {
+    printf("%s", prompt);
+    int ch = getchar();
+    while (getchar() != '\n'); // flush
+    return (char)ch;
+}
+// char get_char_input(const char *prompt) {
+//     char input;
+//     printf("%s", prompt);
+//     scanf(" %c", &input);           // Read a single char, skip whitespace
+//     while (getchar() != '\n');     // Flush remaining input
+//     return tolower(input);         // Normalize to lowercase
+// }

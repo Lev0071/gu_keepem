@@ -37,7 +37,7 @@ typedef struct {
 } GameState;
 
 #define MAX_PLAYERS 4
-
+int dealer_index = 1;
 // Globals
 int player_count = MAX_PLAYERS;
 Card table[5] = {
@@ -49,7 +49,7 @@ void print_card(Card card) {
     printf("[%c%c]", card.rank, card.suit);
 }
 
-void print_player_line(Player *p, int is_current) {
+void print_player_line(Player *p, int is_current,int is_dealer) {
     const char *status_str;
     switch (p->status) {
         case STATUS_ACTIVE: status_str = "Active"; break;
@@ -58,8 +58,13 @@ void print_player_line(Player *p, int is_current) {
         default: status_str = "Unknown"; break;
     }
 
-    printf("%s%-10s | 💰 %3d | Bet %3d | %s | ",
-           is_current ? "👉 " : "   ",
+    // Prefixes
+    char prefix[4] = "   ";
+    if (is_dealer) prefix[0] = 'D';
+    if (is_current) prefix[1] = '*';
+
+    printf("%s %-10s | 💰 %3d | Bet %3d | %s | ",
+           prefix,
            p->name,
            p->credits,
            p->current_bet,
@@ -90,7 +95,7 @@ const char* stage_to_string(RoundStage stage) {
 void print_table_state(GameState *g, Player players[], int current_index) {
     printf("\n========= TABLE STATE: %s =========\n", stage_to_string(g->stage));
     for (int i = 0; i < player_count; i++) {
-        print_player_line(&players[i], i == current_index);
+        print_player_line(&players[i], i == current_index,i==dealer_index);
     }
     printf("Community Cards: ");
     int cards_to_show = 0;

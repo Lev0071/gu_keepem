@@ -287,13 +287,11 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         printf("Only one player remaining. Skipping betting.\n");
         return;
     }
-
     // Reset per-round variables
     g->current_bet = 0;
     g->last_raise_amount = g->big_blind;
 
     int starting_index = (dealer_index + 1) % player_count;
-
     int consecutive_calls = 0;
     int last_to_raise = -1;
     int current_turn = starting_index;
@@ -307,21 +305,26 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         }
 
         int call_amount = g->current_bet - p->current_bet;
-        //printf("\n%s's turn (Credits: %d)\n", p->name, p->credits);
         print_table_state(g, players, current_turn);
         printf("Current bet: %d | Your bet: %d | Call = %d\n", g->current_bet, p->current_bet, call_amount);
-        printf("1. Call | 2. Raise | 3. All-In | 4. Fold\n");
 
-        int choice = get_integer_input("Enter your action: ");
-        if (choice == 1 && is_valid_action(p, g, ACTION_CALL)) {
+        char choice;
+        do {
+            print_valid_actions(p, g, call_amount);
+            choice = get_char_input("");
+            if (choice == 's' || choice == 'S') {
+                print_table_state(g, players, current_turn);
+            }
+        } while (choice == 's' || choice == 'S');
+
+        if ((choice == 'c' || choice == 'C') && is_valid_action(p, g, ACTION_CALL)) {
             int amount = (call_amount > p->credits) ? p->credits : call_amount;
             p->credits -= amount;
             p->current_bet += amount;
             g->pot += amount;
             printf("%s calls %d.\n", p->name, amount);
             consecutive_calls++;
-        }
-        else if (choice == 2 && is_valid_action(p, g, ACTION_RAISE)) {
+        } else if ((choice == 'r' || choice == 'R') && is_valid_action(p, g, ACTION_RAISE)) {
             int raise_amount = get_integer_input("Enter raise amount: ");
             if (raise_amount < g->last_raise_amount) raise_amount = g->last_raise_amount;
             int total_bet = g->current_bet + raise_amount;
@@ -337,8 +340,7 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             last_to_raise = current_turn;
             consecutive_calls = 1;
             printf("%s raises by %d.\n", p->name, raise_amount);
-        }
-        else if (choice == 3 && is_valid_action(p, g, ACTION_ALL_IN)) {
+        } else if ((choice == 'a' || choice == 'A') && is_valid_action(p, g, ACTION_ALL_IN)) {
             int amount = p->credits;
             p->current_bet += amount;
             g->pot += amount;
@@ -353,8 +355,7 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             } else {
                 consecutive_calls++;
             }
-        }
-        else if (choice == 4 && is_valid_action(p, g, ACTION_FOLD)) {
+        } else if ((choice == 'f' || choice == 'F') && is_valid_action(p, g, ACTION_FOLD)) {
             p->status = STATUS_FOLDED;
             printf("%s folds.\n", p->name);
             active_players--;
@@ -369,6 +370,7 @@ void run_prediction_round(RoundStage stage, GameState *g) {
 
     printf("✅ Betting round complete. Pot: %d\n", g->pot);
 }
+
 
 
 bool is_valid_action(Player *p, GameState *g, ActionType action) {
@@ -521,7 +523,7 @@ void resolve_pots_by_rank(Pot pots[], int pot_count, RankedPlayer ranked[], int 
     }
 }
 
-void print_player_line(Player *p, int is_current) {
+void print_player_line(Player *p, int is_current, int is_dealer) {
     const char *status_str;
     switch (p->status) {
         case STATUS_ACTIVE: status_str = "Active"; break;
@@ -530,8 +532,13 @@ void print_player_line(Player *p, int is_current) {
         default: status_str = "Unknown"; break;
     }
 
-    printf("%s%-10s | 💰 %3d | Bet %3d | %s | ",
-           is_current ? "👉 " : "   ",
+    // Prefixes
+    char prefix[4] = "   ";
+    if (is_dealer) prefix[0] = 'D';
+    if (is_current) prefix[1] = '*';
+
+    printf("%s %-10s | 💰 %3d | Bet %3d | %s | ",
+           prefix,
            p->name,
            p->credits,
            p->current_bet,
@@ -590,7 +597,7 @@ void post_blinds(int sb_index, int bb_index, GameState *g) {
 void print_table_state(GameState *g, Player players[], int current_index) {
     printf("\n========= TABLE STATE: %s =========\n", stage_to_string(g->stage));
     for (int i = 0; i < player_count; i++) {
-        print_player_line(&players[i], i == current_index);
+        print_player_line(&players[i], i == current_index,i==dealer_index);
     }
     printf("Community Cards: ");
     int cards_to_show = 0;
@@ -605,3 +612,21 @@ void print_table_state(GameState *g, Player players[], int current_index) {
     printf("\nPot: %d\n", g->pot);
     printf("=======================================\n");
 }
+
+void print_valid_actions(Player *p, GameState *g, int call_amount) {
+    printf("Options:\n");
+    printf("  (S)how cards and pool\n");
+
+    if (is_valid_action(p, g, ACTION_CHECK)) {
+        printf("  (C)heck (no bet) ");
+    } else if (is_valid_action(p, g, ACTION_CALL)) {
+        printf("  (C)all (%d) ", call_amount);
+    }
+
+    if (is_valid_action(p, g, ACTION_RAISE))  printf("[R]aise ");
+    if (is_valid_action(p, g, ACTION_ALL_IN)) printf("[A]ll-In ");
+    if (is_valid_action(p, g, ACTION_FOLD))   printf("[F]old ");
+
+    printf("\nPlease enter option: ");
+}
+
