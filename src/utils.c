@@ -3,10 +3,15 @@
 #include <string.h>
 #include <ctype.h>  // for tolower()
 
+void clearBuffer(){
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);  // flush
+}
+
 int get_integer_input(const char *prompt){
     int value;
     printf("%s",prompt);
-    scanf("%d",&value);
+    if(scanf("%d",&value)==0)return -1;
     int c;
     while((c=getchar()) != '\n' && c!= EOF);
     return value;

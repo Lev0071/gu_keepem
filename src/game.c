@@ -47,22 +47,33 @@ void setup_game(){      // Ask number of players,names,assign credits
     if(player_count == 2)printf("Heads-Up game selected\n");
     else printf("%i player game selected\n",player_count);
     
-    int player_credits = get_integer_input("How many credits will each player start with?: ");
-    big_blind = get_integer_input("What should the big blind be set to: ");
-    if(big_blind>player_credits){
-        do{
-            printf("Cannot be bigger that players initial credits\n");
-            big_blind = get_integer_input("What should the big blind be set to: ");
-        }while(small_blind>big_blind);
+    int player_credits;
+    while (true) {
+        char buffer[100];
+        get_string_input("How many credits will each player start with?: ", buffer, sizeof(buffer));
+        
+        if (sscanf(buffer, "%d", &player_credits) == 1 && player_credits > 0) {
+            break;  // valid input
+        }
+        printf("❌ Invalid response, try again\n");
+    }
+
+    while (true) {
+        char buffer[100];
+        get_string_input("What should the big blind be set to: ", buffer, sizeof(buffer));
+        if (sscanf(buffer, "%d", &big_blind) == 1 && big_blind > 0 && big_blind <= player_credits) {
+            break;
+        }
+        printf("❌ Invalid input. Big blind must be a positive number and ≤ player credits.\n");
     }
     
-    small_blind = get_integer_input("What should the small blind be set to: ");
-
-    if(small_blind>big_blind){
-        do{
-            printf("Cannot be bigger that the big blind\n");
-            small_blind = get_integer_input("What should the small blind be set to: ");
-        }while(small_blind>big_blind);
+    while (true) {
+        char buffer[100];
+        get_string_input("What should the small blind be set to: ", buffer, sizeof(buffer));
+        if (sscanf(buffer, "%d", &small_blind) == 1 && small_blind > 0 && small_blind <= big_blind) {
+            break;
+        }
+        printf("❌ Invalid input. Small blind must be a positive number and ≤ big blind.\n");
     }
     
     for (int i = 0; i < player_count; i++) {
@@ -231,6 +242,9 @@ void play_hand() {
     int bb_index = (dealer_index + 2) % player_count;
     post_blinds(sb_index, bb_index, &g);
 
+    g.current_bet = players[bb_index].current_bet;  // set to big blind
+    g.last_raise_amount = g.big_blind; // first raise is as much as the first bet before any Delta raises exist
+
 
     // Step 3: Deal hole cards to each active player
     deal_hole_cards();
@@ -287,9 +301,6 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         printf("Only one player remaining. Skipping betting.\n");
         return;
     }
-    // Reset per-round variables
-    g->current_bet = 0;
-    g->last_raise_amount = g->big_blind;
 
     int starting_index = (dealer_index + 1) % player_count;
     int consecutive_calls = 0;
@@ -618,14 +629,14 @@ void print_valid_actions(Player *p, GameState *g, int call_amount) {
     printf("  (S)how cards and pool\n");
 
     if (is_valid_action(p, g, ACTION_CHECK)) {
-        printf("  (C)heck (no bet) ");
+        printf("[C]heck (no bet) \n");
     } else if (is_valid_action(p, g, ACTION_CALL)) {
-        printf("  (C)all (%d) ", call_amount);
+        printf("[C]all (%d) \n", call_amount);
     }
 
-    if (is_valid_action(p, g, ACTION_RAISE))  printf("[R]aise ");
-    if (is_valid_action(p, g, ACTION_ALL_IN)) printf("[A]ll-In ");
-    if (is_valid_action(p, g, ACTION_FOLD))   printf("[F]old ");
+    if (is_valid_action(p, g, ACTION_RAISE))  printf("[R]aise \n");
+    if (is_valid_action(p, g, ACTION_ALL_IN)) printf("[A]ll-In \n");
+    if (is_valid_action(p, g, ACTION_FOLD))   printf("[F]old \n");
 
     printf("\nPlease enter option: ");
 }
