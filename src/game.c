@@ -310,22 +310,25 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         return;
     }
 
-    int starting_index;
-    if (stage == STAGE_PREFLOP) {
-        starting_index = (g->big_blind_index + 1) % player_count;
-    } else {
-        starting_index = (g->dealer_index + 1) % player_count;
-    }
-    int consecutive_calls = 0;
-    int last_to_raise = -1;
-    int current_turn = starting_index;
+    int starting_index = (stage == STAGE_PREFLOP) 
+        ? (g->big_blind_index + 1) % player_count 
+        : (g->dealer_index + 1) % player_count;
 
-    while (consecutive_calls < active_players) {
+    int current_turn = starting_index;
+    int last_to_act = -1;
+    int calls_in_row = 0;
+
+    while (true) {
         Player *p = &players[current_turn];
+
+        // Skip folded/all-in/0-credit players
+        if (p->status == STATUS_FOLDED || p->status == STATUS_ALL_IN || p->credits == 0) {
+            current_turn = (current_turn + 1) % player_count;
+            continue;
+        }
 
         printf("It is %s's turn to bet, other players please look away!!\n", p->name);
         wait_for_enter("Press Enter to continue...");
-        //clear_screen();
 
         if (p->in_game != PLAYING || p->status != STATUS_ACTIVE || p->credits == 0) {
             current_turn = (current_turn + 1) % player_count;
@@ -345,16 +348,20 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             }
         } while (choice == 's' || choice == 'S');
 
+        bool acted = false;
+
         if ((choice == 'c' || choice == 'C') && is_valid_action(p, g, ACTION_CALL)) {
             int amount = (call_amount > p->credits) ? p->credits : call_amount;
             p->credits -= amount;
             p->current_bet += amount;
             g->pot += amount;
             printf("%s calls %d.\n", p->name, amount);
-            consecutive_calls++;
-        }else if ((choice == 'c' || choice == 'C') && is_valid_action(p, g, ACTION_CHECK)) {
+            calls_in_row++;
+            acted = true;
+        } else if ((choice == 'c' || choice == 'C') && is_valid_action(p, g, ACTION_CHECK)) {
             printf("%s checks.\n", p->name);
-            consecutive_calls++;
+            calls_in_row++;
+            acted = true;
         } else if ((choice == 'r' || choice == 'R') && is_valid_action(p, g, ACTION_RAISE)) {
             int new_total_bet;
             while (true) {
@@ -372,19 +379,19 @@ void run_prediction_round(RoundStage stage, GameState *g) {
                 printf("Invalid raise. Your total bet must be at least %d and not exceed your credits (%d).\n",
                     g->current_bet + g->last_raise_amount, p->credits + p->current_bet);
             }
+
             int raise_amount = new_total_bet - g->current_bet;
             int diff = new_total_bet - p->current_bet;
 
             p->credits -= diff;
             p->current_bet = new_total_bet;
             g->pot += diff;
-
             g->last_raise_amount = raise_amount;
             g->current_bet = new_total_bet;
-            last_to_raise = current_turn;
-            consecutive_calls = 1;
 
+            calls_in_row = 1; // reset on raise
             printf("%s raises to %d (added %d).\n", p->name, new_total_bet, diff);
+            acted = true;
         } else if ((choice == 'a' || choice == 'A') && is_valid_action(p, g, ACTION_ALL_IN)) {
             int amount = p->credits;
             p->current_bet += amount;
@@ -392,29 +399,35 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             p->credits = 0;
             p->status = STATUS_ALL_IN;
             printf("%s goes all-in with %d.\n", p->name, amount);
+
             if (p->current_bet > g->current_bet) {
                 g->last_raise_amount = p->current_bet - g->current_bet;
                 g->current_bet = p->current_bet;
-                last_to_raise = current_turn;
-                consecutive_calls = 1;
+                calls_in_row = 1; // new raise
             } else {
-                consecutive_calls++;
+                calls_in_row++;
             }
+            acted = true;
         } else if ((choice == 'f' || choice == 'F') && is_valid_action(p, g, ACTION_FOLD)) {
             p->status = STATUS_FOLDED;
             printf("%s folds.\n", p->name);
             active_players--;
+            if (active_players <= 1) break;
+            // do not increment calls_in_row
+            acted = true;
         } else {
             printf("Invalid choice or action not allowed.\n");
-            continue;
         }
 
         if (active_players <= 1) break;
+        if (calls_in_row >= active_players) break;
+
         current_turn = (current_turn + 1) % player_count;
     }
 
     printf("✅ Betting round complete. Pot: %d\n", g->pot);
 }
+
 
 
 
