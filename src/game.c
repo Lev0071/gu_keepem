@@ -309,7 +309,7 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         printf("All players are all-in or folded. Skipping betting.\n");
         return;
     }
-    
+
     printf("\n🔔 Starting %s round!\n", stage_to_string(stage));
 
     int active_players = 0;
@@ -703,3 +703,4 @@ void print_valid_actions(Player *p, GameState *g, int call_amount) {
     printf("\nPlease enter option: ");
 }
 
+//
