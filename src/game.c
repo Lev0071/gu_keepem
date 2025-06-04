@@ -260,7 +260,15 @@ void play_hand() {
     // Step 4: Deal all 5 community cards (flop, turn, river)
     deal_community_cards();
 
-    
+    // For testing only
+    // printf("\n🃏 Shuffled Deck Order:\n");
+    // for (int i = 0; i < 52; i++) {
+    //     printf("%2d: ", i + 1);
+    //     print_card(deck[i]);  // Use your existing pretty-print
+    //     printf("\n");
+    // }
+    // printf("\n");
+
     // Step 5: Run prediction & betting rounds (to be implemented)
     run_prediction_round(STAGE_PREFLOP, &g);
     run_prediction_round(STAGE_FLOP, &g);
@@ -276,14 +284,21 @@ void play_hand() {
 
 
 
-
 int game_over(){
     int active = 0;
-    for(int i =0;i<player_count;i++){
-        if(players[i].in_game && players[i].credits > 0) active++; // as long as all players in the game have credit --> active
+    for(int i = 0; i < player_count; i++){
+        printf("DEBUG: %s => in_game: %d, credits: %d\n", players[i].name, players[i].in_game, players[i].credits);
+        if(players[i].in_game && players[i].credits > 0) active++;
     }
-    return active <= 1;  
+    return active <= 1;
 }
+// int game_over(){
+//     int active = 0;
+//     for(int i =0;i<player_count;i++){
+//         if(players[i].in_game && players[i].credits > 0) active++; // as long as all players in the game have credit --> active
+//     }
+//     return active <= 1;  
+// }
 
 void show_final_message(){     // Print game over message
     for (int i = 0; i < player_count; i++) {
