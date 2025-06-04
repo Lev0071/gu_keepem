@@ -85,6 +85,9 @@ void setup_game(){      // Ask number of players,names,assign credits
     }
 
     dealer_index = rand() % player_count;
+    g.dealer_index = dealer_index;
+    g.small_blind_index = (dealer_index + 1) % player_count;
+    g.big_blind_index   = (dealer_index + 2) % player_count;
     // #if DEBUG
     // printf("\n===== DEBUG DUMP BEFORE EXIT =====\n");
     // printf("Big Blind: %d\n", big_blind);
@@ -150,7 +153,7 @@ void deal_hole_cards(){
     ///////////////////////////
     shuffle_deck(deck, deck_size);
     printf("Deck Shuffled!\n");
-    clearBuffer();
+    //clearBuffer();
     ///////////////////////////
     // printf("\n\n");
     // printf("\n===== shuffle_deck =====\n");
@@ -252,7 +255,7 @@ void play_hand() {
     // Step 3: Deal hole cards to each active player
     deal_hole_cards();
     printf("Cards dealt to all players\n");
-    clearBuffer();
+    //clearBuffer();
 
     // Step 4: Deal all 5 community cards (flop, turn, river)
     deal_community_cards();
@@ -307,7 +310,12 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         return;
     }
 
-    int starting_index = (dealer_index + 1) % player_count;
+    int starting_index;
+    if (stage == STAGE_PREFLOP) {
+        starting_index = (g->big_blind_index + 1) % player_count;
+    } else {
+        starting_index = (g->dealer_index + 1) % player_count;
+    }
     int consecutive_calls = 0;
     int last_to_raise = -1;
     int current_turn = starting_index;
@@ -344,22 +352,39 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             g->pot += amount;
             printf("%s calls %d.\n", p->name, amount);
             consecutive_calls++;
+        }else if ((choice == 'c' || choice == 'C') && is_valid_action(p, g, ACTION_CHECK)) {
+            printf("%s checks.\n", p->name);
+            consecutive_calls++;
         } else if ((choice == 'r' || choice == 'R') && is_valid_action(p, g, ACTION_RAISE)) {
-            int raise_amount = get_integer_input("Enter raise amount: ");
-            if (raise_amount < g->last_raise_amount) raise_amount = g->last_raise_amount;
-            int total_bet = g->current_bet + raise_amount;
-            int diff = total_bet - p->current_bet;
-            if (diff > p->credits) diff = p->credits;
+            int new_total_bet;
+            while (true) {
+                char prompt[100];
+                snprintf(prompt, sizeof(prompt), "Enter total bet (must be at least %d): ", g->current_bet + g->last_raise_amount);
+                new_total_bet = get_integer_input(prompt);
+                int raise_amount = new_total_bet - g->current_bet;
+
+                if (new_total_bet > p->current_bet &&
+                    raise_amount >= g->last_raise_amount &&
+                    new_total_bet - p->current_bet <= p->credits) {
+                    break;
+                }
+
+                printf("Invalid raise. Your total bet must be at least %d and not exceed your credits (%d).\n",
+                    g->current_bet + g->last_raise_amount, p->credits + p->current_bet);
+            }
+            int raise_amount = new_total_bet - g->current_bet;
+            int diff = new_total_bet - p->current_bet;
 
             p->credits -= diff;
-            p->current_bet += diff;
+            p->current_bet = new_total_bet;
             g->pot += diff;
 
             g->last_raise_amount = raise_amount;
-            g->current_bet = p->current_bet;
+            g->current_bet = new_total_bet;
             last_to_raise = current_turn;
             consecutive_calls = 1;
-            printf("%s raises by %d.\n", p->name, raise_amount);
+
+            printf("%s raises to %d (added %d).\n", p->name, new_total_bet, diff);
         } else if ((choice == 'a' || choice == 'A') && is_valid_action(p, g, ACTION_ALL_IN)) {
             int amount = p->credits;
             p->current_bet += amount;

@@ -15,6 +15,8 @@ typedef struct {
     RoundStage stage;
     int pot;
     int dealer_index;
+    int small_blind_index;
+    int big_blind_index;
     int current_bet;
     int small_blind;
     int big_blind;
