@@ -7,5 +7,6 @@ void print_intro();
 void wait_for_enter(const char *message);
 char get_char_input(const char *prompt);
 void clearBuffer();
+void clear_screen();
 
 #endif

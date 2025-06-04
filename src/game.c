@@ -12,6 +12,7 @@
 #include "pot.h"
 #include <stdbool.h>
 
+
 #define MAX_PLAYERS 8 
 #define INITIAL_CREDITS 100 // Can be provided by the user in the next iteration
 #define SMALL_GUESS 5
@@ -55,7 +56,7 @@ void setup_game(){      // Ask number of players,names,assign credits
         if (sscanf(buffer, "%d", &player_credits) == 1 && player_credits > 0) {
             break;  // valid input
         }
-        printf("❌ Invalid response, try again\n");
+        printf("Invalid response, try again\n");
     }
 
     while (true) {
@@ -64,7 +65,7 @@ void setup_game(){      // Ask number of players,names,assign credits
         if (sscanf(buffer, "%d", &big_blind) == 1 && big_blind > 0 && big_blind <= player_credits) {
             break;
         }
-        printf("❌ Invalid input. Big blind must be a positive number and ≤ player credits.\n");
+        printf("Invalid input. Big blind must be a positive number and ≤ player credits.\n");
     }
     
     while (true) {
@@ -73,7 +74,7 @@ void setup_game(){      // Ask number of players,names,assign credits
         if (sscanf(buffer, "%d", &small_blind) == 1 && small_blind > 0 && small_blind <= big_blind) {
             break;
         }
-        printf("❌ Invalid input. Small blind must be a positive number and ≤ big blind.\n");
+        printf("Invalid input. Small blind must be a positive number and ≤ big blind.\n");
     }
     
     for (int i = 0; i < player_count; i++) {
@@ -84,19 +85,19 @@ void setup_game(){      // Ask number of players,names,assign credits
     }
 
     dealer_index = rand() % player_count;
-    #if DEBUG
-    printf("\n===== DEBUG DUMP BEFORE EXIT =====\n");
-    printf("Big Blind: %d\n", big_blind);
-    printf("Small Blind: %d\n", small_blind);
-    printf("Player Count: %d\n", player_count);
-    for (int i = 0; i < player_count; i++) {
-        printf("Player %d:\n", i + 1);
-        printf("  Name:    %s\n", players[i].name);
-        printf("  Credits: %d\n", players[i].credits);
-        printf("  In Game: %s\n", players[i].in_game == PLAYING ? "PLAYING" : "QUIT");
-    }
-    printf("==================================\n");
-    #endif
+    // #if DEBUG
+    // printf("\n===== DEBUG DUMP BEFORE EXIT =====\n");
+    // printf("Big Blind: %d\n", big_blind);
+    // printf("Small Blind: %d\n", small_blind);
+    // printf("Player Count: %d\n", player_count);
+    // for (int i = 0; i < player_count; i++) {
+    //     printf("Player %d:\n", i + 1);
+    //     printf("  Name:    %s\n", players[i].name);
+    //     printf("  Credits: %d\n", players[i].credits);
+    //     printf("  In Game: %s\n", players[i].in_game == PLAYING ? "PLAYING" : "QUIT");
+    // }
+    // printf("==================================\n");
+    // #endif
     
     g.big_blind = big_blind;
     g.small_blind = small_blind;
@@ -148,6 +149,8 @@ void deal_hole_cards(){
     // printf("==================================\n");
     ///////////////////////////
     shuffle_deck(deck, deck_size);
+    printf("Deck Shuffled!\n");
+    clearBuffer();
     ///////////////////////////
     // printf("\n\n");
     // printf("\n===== shuffle_deck =====\n");
@@ -248,6 +251,8 @@ void play_hand() {
 
     // Step 3: Deal hole cards to each active player
     deal_hole_cards();
+    printf("Cards dealt to all players\n");
+    clearBuffer();
 
     // Step 4: Deal all 5 community cards (flop, turn, river)
     deal_community_cards();
@@ -309,6 +314,10 @@ void run_prediction_round(RoundStage stage, GameState *g) {
 
     while (consecutive_calls < active_players) {
         Player *p = &players[current_turn];
+
+        printf("It is %s's turn to bet, other players please look away!!\n", p->name);
+        wait_for_enter("Press Enter to continue...");
+        //clear_screen();
 
         if (p->in_game != PLAYING || p->status != STATUS_ACTIVE || p->credits == 0) {
             current_turn = (current_turn + 1) % player_count;
@@ -558,11 +567,11 @@ void print_player_line(Player *p, int is_current, int is_dealer) {
 
     if (p->status == STATUS_FOLDED) {
         printf("[Folded]\n");
+    } else if (is_current) {
+        print_card(p->hand[0]); printf(" ");
+        print_card(p->hand[1]); printf("\n");
     } else {
-        print_card(p->hand[0]);
-        printf(" ");
-        print_card(p->hand[1]);
-        printf("\n");
+        printf("*******\n");
     }
 }
 
@@ -601,6 +610,9 @@ void post_blinds(int sb_index, int bb_index, GameState *g) {
     g->current_bet = bb_amount;
     g->last_raise_amount = g->big_blind;
 
+    g->pot += sb_amount;
+    g->pot += bb_amount;
+
     printf("💰 Small blind posted by %s (%d credits)\n", players[sb_index].name, sb_amount);
     printf("💰 Big blind posted by %s (%d credits)\n", players[bb_index].name, bb_amount);
 }
@@ -626,7 +638,6 @@ void print_table_state(GameState *g, Player players[], int current_index) {
 
 void print_valid_actions(Player *p, GameState *g, int call_amount) {
     printf("Options:\n");
-    printf("  (S)how cards and pool\n");
 
     if (is_valid_action(p, g, ACTION_CHECK)) {
         printf("[C]heck (no bet) \n");

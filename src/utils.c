@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>  // for tolower()
+#include <stdlib.h>  // for system()
 
 void clearBuffer(){
     char ch;
@@ -60,3 +61,11 @@ char get_char_input(const char *prompt) {
 //     while (getchar() != '\n');     // Flush remaining input
 //     return tolower(input);         // Normalize to lowercase
 // }
+
+void clear_screen() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
