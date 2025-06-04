@@ -297,6 +297,19 @@ void show_final_message(){     // Print game over message
 
 void run_prediction_round(RoundStage stage, GameState *g) {
     g->stage = stage;
+
+    int all_in_or_folded = 1;
+    for (int i = 0; i < player_count; i++) {
+        if (players[i].status == STATUS_ACTIVE && players[i].credits > 0) {
+            all_in_or_folded = 0;
+            break;
+        }
+    }
+    if (all_in_or_folded) {
+        printf("All players are all-in or folded. Skipping betting.\n");
+        return;
+    }
+    
     printf("\n🔔 Starting %s round!\n", stage_to_string(stage));
 
     int active_players = 0;
