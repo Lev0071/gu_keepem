@@ -353,13 +353,15 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             continue;
         }
 
-        printf("It is %s's turn to bet, other players please look away!!\n", p->name);
-        wait_for_enter("Press Enter to continue...");
-
         if (p->in_game != PLAYING || p->status != STATUS_ACTIVE || p->credits == 0) {
             current_turn = (current_turn + 1) % player_count;
             continue;
         }
+
+        printf("It is %s's turn to bet, other players please look away!!\n", p->name);
+        wait_for_enter("Press Enter to continue...");
+
+
 
         int call_amount = g->current_bet - p->current_bet;
         print_table_state(g, players, current_turn);
