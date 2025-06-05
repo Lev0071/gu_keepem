@@ -338,13 +338,11 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         return;
     }
 
-    int starting_index = (stage == STAGE_PREFLOP) 
-        ? (g->big_blind_index + 1) % player_count 
-        : (g->dealer_index + 1) % player_count;
+    int starting_index = (stage == STAGE_PREFLOP) ? (g->big_blind_index + 1) % player_count : (g->dealer_index + 1) % player_count;
 
     int current_turn = starting_index;
-    int last_to_act = -1;
-    int calls_in_row = 0;
+    int last_to_act = -1; // not used
+    int calls_in_row = 0; // counts how many players have matched the current bet since the last or bet.
 
     while (true) {
         Player *p = &players[current_turn];
@@ -448,7 +446,7 @@ void run_prediction_round(RoundStage stage, GameState *g) {
         }
 
         if (active_players <= 1) break;
-        if (calls_in_row >= active_players) break;
+        if (calls_in_row >= active_players) break; //  betting round ends when - everyone still in the hand has matched the highest bet or checked — no new betting action is occurring.
 
         current_turn = (current_turn + 1) % player_count;
     }
