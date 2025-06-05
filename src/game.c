@@ -660,7 +660,7 @@ void resolve_betting_round(Player players[], int num_players, Card table[5]) {
 }
 
 void post_blinds(int sb_index, int bb_index, GameState *g) {
-    if (!players[sb_index].in_game || players[sb_index].credits <= 0) return;
+    if (!players[sb_index].in_game || players[sb_index].credits <= 0) return; // Check SB and BB players still eligible
     if (!players[bb_index].in_game || players[bb_index].credits <= 0) return;
 
     int sb_amount = (players[sb_index].credits >= g->small_blind) ? g->small_blind : players[sb_index].credits;
