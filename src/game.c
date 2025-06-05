@@ -445,7 +445,7 @@ void run_prediction_round(RoundStage stage, GameState *g) {
             printf("Invalid choice or action not allowed.\n");
         }
 
-        if (active_players <= 1) break;
+        if (active_players <= 1) break; // end the betting round if one man standing
         if (calls_in_row >= active_players) break; //  betting round ends when - everyone still in the hand has matched the highest bet or checked — no new betting action is occurring.
 
         current_turn = (current_turn + 1) % player_count;
